@@ -41,7 +41,7 @@ public class UI {
                     validInput = true;
                 }
             } catch (ChessGameException e) {
-                System.out.println(e);
+                System.out.println(e.getMessage());
                 System.out.print("To move: ");
             }
         }

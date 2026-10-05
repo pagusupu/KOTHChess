@@ -43,7 +43,7 @@ public class ChessProgram {
                     try {
                         validMoves = cgr.simulateMoves(toMove, cgr.selectPiece(toMove));
                     } catch (ChessGameException e) {
-                        System.out.println(e);
+                        System.out.println(e.getMessage());
                         System.out.print("To move: ");
                     }
                 }
@@ -58,7 +58,7 @@ public class ChessProgram {
                     try {
                         cgr.confirmMove(toMove, target, validMoves);
                     } catch (ChessGameException e) {
-                        System.out.println(e);
+                        System.out.println(e.getMessage());
                         System.out.print("Target: ");
                     }
                 }
@@ -74,7 +74,7 @@ public class ChessProgram {
                         try {
                             cgr.promotePiece(target, scan);
                         } catch (ChessGameException e) {
-                            System.out.println(e);
+                            System.out.println(e.getMessage());
                         }
                     }
                 }
@@ -133,15 +133,15 @@ public class ChessProgram {
                 }
 
             } catch (FileNotFoundException e) {
-                System.out.println(e);
+                System.out.println(e.getMessage());
             } catch (IOException | InterruptedException e) {
-                System.out.println(e);
+                System.out.println(e.getMessage());
             } finally {
                 if (br != null) {
                     try {
                         br.close();
                     } catch (IOException e) {
-                        System.out.println(e);
+                        System.out.println(e.getMessage());
                     }
                 }
             }
