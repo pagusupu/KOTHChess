@@ -1,0 +1,87 @@
+package KOTHChessGame.ChessPieces;
+
+import KOTHChessGame.ChessBoard;
+import KOTHChessGame.ChessPiece;
+import KOTHChessGame.Color;
+import KOTHChessGame.Position;
+import KOTHChessGame.SquareState;
+import java.util.ArrayList;
+
+public class Knight extends ChessPiece {
+
+    public Knight(ChessBoard board, Color color) {
+        super(board, color);
+    }
+
+    @Override
+    public ArrayList<Position> validMoves(Position pos) {
+        ArrayList<Position> vm = new ArrayList();
+        Position p = new Position(0, 0);
+
+        // 1 down, 2 left
+        p.setValues(pos.getRank() - 1, pos.getFile() - 2);
+        if (isEmptyOrOpposingPiece(p)) {
+            vm.add(new Position(p.getRank(), p.getFile()));
+        }
+
+        // 2 down, 1 left
+        p.setValues(pos.getRank() - 2, pos.getFile() - 1);
+        if (isEmptyOrOpposingPiece(p)) {
+            vm.add(new Position(p.getRank(), p.getFile()));
+        }
+
+        // 2 down, 1 right
+        p.setValues(pos.getRank() - 2, pos.getFile() + 1);
+        if (isEmptyOrOpposingPiece(p)) {
+            vm.add(new Position(p.getRank(), p.getFile()));
+        }
+
+        // 1 down, 2 right
+        p.setValues(pos.getRank() - 1, pos.getFile() + 2);
+        if (isEmptyOrOpposingPiece(p)) {
+            vm.add(new Position(p.getRank(), p.getFile()));
+        }
+
+        // 1 up, 2 right
+        p.setValues(pos.getRank() + 1, pos.getFile() + 2);
+        if (isEmptyOrOpposingPiece(p)) {
+            vm.add(new Position(p.getRank(), p.getFile()));
+        }
+
+        // 2 up, 1 right
+        p.setValues(pos.getRank() + 2, pos.getFile() + 1);
+        if (isEmptyOrOpposingPiece(p)) {
+            vm.add(new Position(p.getRank(), p.getFile()));
+        }
+
+        // 2 up, 1 left
+        p.setValues(pos.getRank() + 2, pos.getFile() - 1);
+        if (isEmptyOrOpposingPiece(p)) {
+            vm.add(new Position(p.getRank(), p.getFile()));
+        }
+
+        // 1 up, 2 left
+        p.setValues(pos.getRank() + 1, pos.getFile() - 2);
+        if (isEmptyOrOpposingPiece(p)) {
+            vm.add(new Position(p.getRank(), p.getFile()));
+        }
+
+        return vm;
+    }
+
+    private boolean isEmptyOrOpposingPiece(Position p) {
+        return (board.checkPosition(p) == SquareState.EMPTY
+                || (board.checkPosition(p) == SquareState.OCCUPIED && board.getPieceAt(p).getColor() != color));
+    }
+
+    @Override
+    public String toString() {
+        return "N";
+    }
+    
+    @Override
+    public Knight copy(ChessBoard cb) {
+        Knight newPiece = new Knight(cb, this.color);
+        return newPiece;
+    }
+}
