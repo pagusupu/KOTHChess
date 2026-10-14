@@ -1,9 +1,9 @@
 package KOTHChessGame.Application;
 
-import KOTHChessGame.ChessGameController;
-import KOTHChessGame.ChessGameException;
-import KOTHChessGame.Color;
-import KOTHChessGame.Position;
+import KOTHChessGame.Model.ChessGameController;
+import KOTHChessGame.Model.ChessGameException;
+import KOTHChessGame.Model.Color;
+import KOTHChessGame.Model.Position;
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileReader;

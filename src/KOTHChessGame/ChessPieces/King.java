@@ -1,10 +1,10 @@
 package KOTHChessGame.ChessPieces;
 
-import KOTHChessGame.ChessBoard;
-import KOTHChessGame.ChessPiece;
-import KOTHChessGame.Color;
-import KOTHChessGame.Position;
-import KOTHChessGame.SquareState;
+import KOTHChessGame.Model.ChessBoard;
+import KOTHChessGame.Model.ChessPiece;
+import KOTHChessGame.Model.Color;
+import KOTHChessGame.Model.Position;
+import KOTHChessGame.Model.SquareState;
 import java.util.ArrayList;
 
 public class King extends ChessPiece {
@@ -15,7 +15,7 @@ public class King extends ChessPiece {
 
     @Override
     public ArrayList<Position> validMoves(Position pos) {
-        ArrayList<Position> vm = new ArrayList();
+        ArrayList<Position> vm = new ArrayList<Position>();
         Position p = new Position(0, 0);
 
         // tests for squares in 3x3 centered around pos

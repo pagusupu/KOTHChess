@@ -1,4 +1,4 @@
-package KOTHChessGame;
+package KOTHChessGame.Model;
 
 import KOTHChessGame.ChessPieces.Bishop;
 import KOTHChessGame.ChessPieces.King;
@@ -19,7 +19,7 @@ public class ChessGameController {
     private ChessBoard cb;
     private Color currentTurn;
     private int turn;
-    private LinkedList<Position> actionLog = new LinkedList();
+    private LinkedList<Position> actionLog = new LinkedList<Position>();
 
     public ChessGameController() {
         cb = new ChessBoard();

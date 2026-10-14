@@ -1,4 +1,4 @@
-package KOTHChessGame;
+package KOTHChessGame.Model;
 
 import java.util.ArrayList;
 
@@ -8,8 +8,8 @@ public class ChessBoard {
     private int rank;
     private int file;
 
-    private ArrayList<ChessPiece> piecesOnBoard = new ArrayList();
-    private ArrayList<ChessPiece> capturedPieces = new ArrayList();
+    private ArrayList<ChessPiece> piecesOnBoard = new ArrayList<ChessPiece>();
+    private ArrayList<ChessPiece> capturedPieces = new ArrayList<ChessPiece>();
 
     public ChessBoard() {
         pieces = new ChessPiece[8][8];

@@ -1,4 +1,4 @@
-package KOTHChessGame;
+package KOTHChessGame.Model;
 
 import java.util.ArrayList;
 

@@ -1,4 +1,4 @@
-package KOTHChessGame;
+package KOTHChessGame.Model;
 
 public class ChessGameException extends RuntimeException {
 

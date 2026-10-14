@@ -1,11 +1,11 @@
 package KOTHChessGame.Application;
 
-import KOTHChessGame.ChessBoard;
-import KOTHChessGame.ChessGameController;
-import KOTHChessGame.ChessGameException;
-import KOTHChessGame.ChessPiece;
-import KOTHChessGame.Position;
-import KOTHChessGame.Color;
+import KOTHChessGame.Model.ChessBoard;
+import KOTHChessGame.Model.ChessGameController;
+import KOTHChessGame.Model.ChessGameException;
+import KOTHChessGame.Model.ChessPiece;
+import KOTHChessGame.Model.Position;
+import KOTHChessGame.Model.Color;
 
 import java.util.ArrayList;
 import java.util.Scanner;
