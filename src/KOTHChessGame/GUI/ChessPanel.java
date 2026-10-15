@@ -6,8 +6,10 @@ import javax.swing.JPanel;
 
 public class ChessPanel extends JPanel{
     
+    
+    
     @Override
     public void paintComponent(Graphics g){
-        super.paintcomponent(g);
+        super.paintComponent(g);
     }
 }
