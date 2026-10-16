@@ -2,7 +2,7 @@ package KOTHChessGame.ChessPieces;
 
 import KOTHChessGame.Model.ChessBoard;
 import KOTHChessGame.Model.ChessPiece;
-import KOTHChessGame.Model.Color;
+import KOTHChessGame.Model.PieceColor;
 import KOTHChessGame.Model.Position;
 import KOTHChessGame.Model.SquareState;
 import java.util.ArrayList;
@@ -11,7 +11,7 @@ public class Pawn extends ChessPiece {
 
     private boolean enPassant;
 
-    public Pawn(ChessBoard board, Color color) {
+    public Pawn(ChessBoard board, PieceColor color) {
         super(board, color);
         enPassant = false;
     }
@@ -47,7 +47,7 @@ public class Pawn extends ChessPiece {
         Position enp = new Position(0, 0);
 
         // white
-        if (this.color == Color.WHITE) {
+        if (this.color == PieceColor.WHITE) {
             // 1 step ahead
             p.setValues(pos.getRank() + 1, pos.getFile());
             if (board.checkPosition(p) == SquareState.EMPTY) {
@@ -81,7 +81,7 @@ public class Pawn extends ChessPiece {
         }
 
         // white
-        if (this.color == Color.WHITE) {
+        if (this.color == PieceColor.WHITE) {
             // diagonal capture, right
             p.setValues(pos.getRank() + 1, pos.getFile() + 1);
             enp.setValues(pos.getRank(), pos.getFile() + 1);

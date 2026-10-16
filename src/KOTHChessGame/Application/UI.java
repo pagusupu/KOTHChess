@@ -5,7 +5,7 @@ import KOTHChessGame.Model.ChessGameController;
 import KOTHChessGame.Model.ChessGameException;
 import KOTHChessGame.Model.ChessPiece;
 import KOTHChessGame.Model.Position;
-import KOTHChessGame.Model.Color;
+import KOTHChessGame.Model.PieceColor;
 
 import java.util.ArrayList;
 import java.util.Scanner;
@@ -55,7 +55,7 @@ public class UI {
     public static void printMatch(ChessBoard cb, ChessGameController cgr) {
         // Print the board with all extra info
         System.out.println("Turn: " + cgr.getTurn());
-        if (cgr.getTurnColor() == Color.BLACK) {
+        if (cgr.getTurnColor() == PieceColor.BLACK) {
             System.out.println("Color: " + (ANSI_RED + cgr.getTurnColor()) + ANSI_RESET);
         } else {
             System.out.println("Color: " + cgr.getTurnColor());
@@ -108,7 +108,7 @@ public class UI {
         if (piece == null) {
             System.out.print("-" + ANSI_RESET);
         } else {
-            if (piece.getColor() == Color.WHITE) {
+            if (piece.getColor() == PieceColor.WHITE) {
                 System.out.print(ANSI_WHITE + piece.toString() + ANSI_RESET);
             } else {
                 System.out.print(ANSI_RED + piece.toString() + ANSI_RESET);
@@ -123,9 +123,9 @@ public class UI {
         ArrayList<ChessPiece> black = new ArrayList();
 
         for (int i = 0; i < pieces.size(); i++) {
-            if (pieces.get(i).getColor() == Color.WHITE) {
+            if (pieces.get(i).getColor() == PieceColor.WHITE) {
                 white.add(pieces.get(i));
-            } else if (pieces.get(i).getColor() == Color.BLACK) {
+            } else if (pieces.get(i).getColor() == PieceColor.BLACK) {
                 black.add(pieces.get(i));
             }
         }

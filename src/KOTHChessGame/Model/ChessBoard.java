@@ -141,7 +141,7 @@ public class ChessBoard {
         return valid;
     }
 
-    public boolean canBeOccupied(Color color, Position pos) {
+    public boolean canBeOccupied(PieceColor color, Position pos) {
         // Checks if any piece of a given color can move to a specified position
         for (int i = 0; i < rank; i++) {
             for (int j = 0; j < file; j++) {

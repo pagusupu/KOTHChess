@@ -2,7 +2,7 @@ package KOTHChessGame.Application;
 
 import KOTHChessGame.Model.ChessGameController;
 import KOTHChessGame.Model.ChessGameException;
-import KOTHChessGame.Model.Color;
+import KOTHChessGame.Model.PieceColor;
 import KOTHChessGame.Model.Position;
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
@@ -82,7 +82,7 @@ public class ChessProgram {
                 System.out.println("");
             }
 
-            if (cgr.getTurnColor() == Color.WHITE) {
+            if (cgr.getTurnColor() == PieceColor.WHITE) {
                 System.out.println("BLACK WINS!");
             } else {
                 System.out.println("WHITE WINS!");
@@ -126,7 +126,7 @@ public class ChessProgram {
 
                 UI.printMatch(cgr.getBoard(), cgr);
                 System.out.println("");
-                if (cgr.getTurnColor() == Color.WHITE) {
+                if (cgr.getTurnColor() == PieceColor.WHITE) {
                     System.out.println("BLACK WINS!");
                 } else {
                     System.out.println("WHITE WINS!");

@@ -1,6 +1,6 @@
 package KOTHChessGame.Model;
 
-public enum Color {
+public enum PieceColor {
     BLACK,
     WHITE;
 }

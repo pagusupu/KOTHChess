@@ -17,7 +17,7 @@ import java.util.Scanner;
 public class ChessGameController {
 
     private ChessBoard cb;
-    private Color currentTurn;
+    private PieceColor currentTurn;
     private int turn;
     private LinkedList<Position> actionLog = new LinkedList<Position>();
 
@@ -34,15 +34,15 @@ public class ChessGameController {
         return turn;
     }
 
-    public Color getTurnColor() {
+    public PieceColor getTurnColor() {
         return currentTurn;
     }
 
     public void increaseTurn() {
-        if (currentTurn == Color.WHITE) {
-            currentTurn = Color.BLACK;
+        if (currentTurn == PieceColor.WHITE) {
+            currentTurn = PieceColor.BLACK;
         } else {
-            currentTurn = Color.WHITE;
+            currentTurn = PieceColor.WHITE;
             turn += 1;
         }
     }
@@ -189,7 +189,7 @@ public class ChessGameController {
         // Promote piece to given type
         if (isPromotable(target)) {
             String input = scan.nextLine().trim();
-            Color color = cb.getPieceAt(target).color;
+            PieceColor color = cb.getPieceAt(target).color;
             ChessPiece piece = new Pawn(cb, color);
 
             if (input.equalsIgnoreCase("q")) {
@@ -213,14 +213,14 @@ public class ChessGameController {
         // Return true if piece is a Pawn and in a space to be promoted
         for (int i = 0; i < cb.getFiles(); i++) {
             if (cb.getPieceAt(target) instanceof Pawn
-                    && cb.getPieceAt(target).color == Color.BLACK
+                    && cb.getPieceAt(target).color == PieceColor.BLACK
                     && new Position(0, i).equals(target)) {
                 return true;
             }
         }
         for (int i = 0; i < cb.getFiles(); i++) {
             if (cb.getPieceAt(target) instanceof Pawn
-                    && cb.getPieceAt(target).color == Color.WHITE
+                    && cb.getPieceAt(target).color == PieceColor.WHITE
                     && new Position(7, i).equals(target)) {
                 return true;
             }
@@ -231,32 +231,32 @@ public class ChessGameController {
     private void initializeBoard() {
         // place pawns
         for (int i = 0; i < cb.getFiles(); i++) {
-            cb.placePiece(new Pawn(cb, Color.WHITE), new Position(1, i));
-            cb.placePiece(new Pawn(cb, Color.BLACK), new Position(6, i));
+            cb.placePiece(new Pawn(cb, PieceColor.WHITE), new Position(1, i));
+            cb.placePiece(new Pawn(cb, PieceColor.BLACK), new Position(6, i));
         }
 
         // place white pieces
-        cb.placePiece(new Rook(cb, Color.WHITE), new Position(0, 0));
-        cb.placePiece(new Knight(cb, Color.WHITE), new Position(0, 1));
-        cb.placePiece(new Bishop(cb, Color.WHITE), new Position(0, 2));
-        cb.placePiece(new Queen(cb, Color.WHITE), new Position(0, 3));
-        cb.placePiece(new King(cb, Color.WHITE), new Position(0, 4));
-        cb.placePiece(new Bishop(cb, Color.WHITE), new Position(0, 5));
-        cb.placePiece(new Knight(cb, Color.WHITE), new Position(0, 6));
-        cb.placePiece(new Rook(cb, Color.WHITE), new Position(0, 7));
+        cb.placePiece(new Rook(cb, PieceColor.WHITE), new Position(0, 0));
+        cb.placePiece(new Knight(cb, PieceColor.WHITE), new Position(0, 1));
+        cb.placePiece(new Bishop(cb, PieceColor.WHITE), new Position(0, 2));
+        cb.placePiece(new Queen(cb, PieceColor.WHITE), new Position(0, 3));
+        cb.placePiece(new King(cb, PieceColor.WHITE), new Position(0, 4));
+        cb.placePiece(new Bishop(cb, PieceColor.WHITE), new Position(0, 5));
+        cb.placePiece(new Knight(cb, PieceColor.WHITE), new Position(0, 6));
+        cb.placePiece(new Rook(cb, PieceColor.WHITE), new Position(0, 7));
 
         // place black pieces
-        cb.placePiece(new Rook(cb, Color.BLACK), new Position(7, 0));
-        cb.placePiece(new Knight(cb, Color.BLACK), new Position(7, 1));
-        cb.placePiece(new Bishop(cb, Color.BLACK), new Position(7, 2));
-        cb.placePiece(new Queen(cb, Color.BLACK), new Position(7, 3));
-        cb.placePiece(new King(cb, Color.BLACK), new Position(7, 4));
-        cb.placePiece(new Bishop(cb, Color.BLACK), new Position(7, 5));
-        cb.placePiece(new Knight(cb, Color.BLACK), new Position(7, 6));
-        cb.placePiece(new Rook(cb, Color.BLACK), new Position(7, 7));
+        cb.placePiece(new Rook(cb, PieceColor.BLACK), new Position(7, 0));
+        cb.placePiece(new Knight(cb, PieceColor.BLACK), new Position(7, 1));
+        cb.placePiece(new Bishop(cb, PieceColor.BLACK), new Position(7, 2));
+        cb.placePiece(new Queen(cb, PieceColor.BLACK), new Position(7, 3));
+        cb.placePiece(new King(cb, PieceColor.BLACK), new Position(7, 4));
+        cb.placePiece(new Bishop(cb, PieceColor.BLACK), new Position(7, 5));
+        cb.placePiece(new Knight(cb, PieceColor.BLACK), new Position(7, 6));
+        cb.placePiece(new Rook(cb, PieceColor.BLACK), new Position(7, 7));
 
         // set first turn to White
-        currentTurn = Color.WHITE;
+        currentTurn = PieceColor.WHITE;
         turn = 1;
     }
 

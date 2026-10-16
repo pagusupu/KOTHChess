@@ -2,14 +2,14 @@ package KOTHChessGame.ChessPieces;
 
 import KOTHChessGame.Model.ChessBoard;
 import KOTHChessGame.Model.ChessPiece;
-import KOTHChessGame.Model.Color;
+import KOTHChessGame.Model.PieceColor;
 import KOTHChessGame.Model.Position;
 import KOTHChessGame.Model.SquareState;
 import java.util.ArrayList;
 
 public class Knight extends ChessPiece {
 
-    public Knight(ChessBoard board, Color color) {
+    public Knight(ChessBoard board, PieceColor color) {
         super(board, color);
     }
 

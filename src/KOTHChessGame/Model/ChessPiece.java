@@ -2,13 +2,13 @@ package KOTHChessGame.Model;
 
 import java.util.ArrayList;
 
-public abstract class ChessPiece {
+public abstract class ChessPiece{
 
     protected ChessBoard board;
-    protected Color color;
+    protected PieceColor color;
     protected int turnCount;
 
-    public ChessPiece(ChessBoard board, Color color) {
+    public ChessPiece(ChessBoard board, PieceColor color) {
         this.board = board;
         this.color = color;
         turnCount = 0;
@@ -25,8 +25,8 @@ public abstract class ChessPiece {
     public ChessBoard getBoard() {
         return board;
     }
-
-    public Color getColor() {
+    
+    public PieceColor getColor() {
         return color;
     }
 
