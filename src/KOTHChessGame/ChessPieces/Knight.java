@@ -8,9 +8,11 @@ import KOTHChessGame.Model.SquareState;
 import java.util.ArrayList;
 
 public class Knight extends ChessPiece {
-
+    
     public Knight(ChessBoard board, PieceColor color) {
         super(board, color);
+        whiteIcon = "./resources/BoardAssets/WKnight.png";
+        blackIcon = "./resources/BoardAssets/BKnight.png";
     }
 
     @Override

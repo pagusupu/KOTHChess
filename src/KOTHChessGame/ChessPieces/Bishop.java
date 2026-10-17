@@ -11,6 +11,8 @@ public class Bishop extends ChessPiece {
 
     public Bishop(ChessBoard board, PieceColor color) {
         super(board, color);
+        whiteIcon = "./resources/BoardAssets/WBishop.png";
+        blackIcon = "./resources/BoardAssets/BBishop.png";
     }
 
     @Override

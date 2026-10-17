@@ -8,9 +8,14 @@ import KOTHChessGame.Model.SquareState;
 import java.util.ArrayList;
 
 public class Rook extends ChessPiece {
+    
+    protected static final String BLACK_ICON = "./resources/BoardAssets/BRook.png";
+    protected static final String WHITE_ICON = "./resources/BoardAssets/WRook.png";
 
     public Rook(ChessBoard board, PieceColor color) {
         super(board, color);
+        whiteIcon = "./resources/BoardAssets/WRook.png";
+        blackIcon = "./resources/BoardAssets/BRook.png";
     }
 
     @Override

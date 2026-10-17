@@ -7,11 +7,23 @@ public abstract class ChessPiece{
     protected ChessBoard board;
     protected PieceColor color;
     protected int turnCount;
+    protected String whiteIcon;
+    protected String blackIcon;
 
     public ChessPiece(ChessBoard board, PieceColor color) {
         this.board = board;
         this.color = color;
         turnCount = 0;
+        whiteIcon = null;
+        blackIcon = null;
+    }
+    
+    public String getIcon(){
+        if(color == PieceColor.BLACK){
+            return blackIcon;
+        }else{
+            return whiteIcon;
+        }
     }
 
     public int getTurnCount() {

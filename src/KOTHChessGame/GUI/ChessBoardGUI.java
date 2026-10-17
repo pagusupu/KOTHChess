@@ -1,14 +1,20 @@
 
 package KOTHChessGame.GUI;
 
+import KOTHChessGame.ChessPieces.Pawn;
 import KOTHChessGame.Controller.ChessGUIEventController;
-import KOTHChessGame.Model.Position;
+import KOTHChessGame.Model.ChessBoard;
+import KOTHChessGame.Model.PieceColor;
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.GridLayout;
 import java.awt.Image;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JPanel;
@@ -19,12 +25,15 @@ public class ChessBoardGUI extends JPanel{
     public static final int PANELHEIGHT = 1000;
     private static final int RANK = 8;
     private static final int FILE = 8;
-    private final Image boardImage;
-    private static final Color GOLD = new Color(253,224,144);
+    private static final int SQUARELENGTH = PANELWIDTH/RANK;
+    private static final Color TRANSLUCENTBLUE = new Color(0, 0, 255, 128);
+    private static final String boardPNG = "./resources/BoardAssets/ChessBoard.png";
     
-    private Image[][] chessPieceImages = new Image[2][6];
-    private JButton[][] chessButtons = new JButton[RANK][FILE];
+    private final Image boardImage;
+    private final JButton[][] chessButtons = new JButton[RANK][FILE];
+    private final boolean[][] highlightedSquares = new boolean[RANK][FILE];
     private ChessGUIEventController controller;
+    
     
     
     public ChessBoardGUI(){
@@ -32,8 +41,11 @@ public class ChessBoardGUI extends JPanel{
         // sets up grid buttons
         controller = new ChessGUIEventController();
         
-        boardImage = new ImageIcon("./resources/BoardAssets/ChessBoard.png").getImage();
+        boardImage = new ImageIcon(boardPNG).getImage();
         
+        setMinimumSize(new Dimension(PANELWIDTH, PANELHEIGHT));
+        setMaximumSize(new Dimension(PANELWIDTH, PANELHEIGHT));
+        setPreferredSize(new Dimension(PANELWIDTH, PANELHEIGHT));
         setLayout(new GridLayout(8, 8));
         setOpaque(false);
         
@@ -44,14 +56,11 @@ public class ChessBoardGUI extends JPanel{
                 add(b);
             }
         }
-    }
-    
-    private final void setBoardImage(){
         
-        
-        
-        
-        
+        // test
+        ChessBoard cb = new ChessBoard();
+        Pawn pawn = new Pawn(cb, PieceColor.WHITE);
+        placePieceDisplay(0, 0, pawn.getIcon());
     }
     
     private JButton createGridButton(int rank, int file){
@@ -64,35 +73,53 @@ public class ChessBoardGUI extends JPanel{
         squareButton.setBorderPainted(true);
         squareButton.setFocusPainted(true);
 
-        //test 
-        squareButton.addActionListener(new ActionListener() {
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            System.out.println("Clicked: " + new Position(rank, file));
-            }
+        squareButton.addActionListener((ActionEvent e) -> {
+            controller.clickedSquare(rank, file);
+            toggleSquareHighlight(rank, file);
         }); 
         return squareButton;
     }
     
     
-    
-    public void initializeBoardDisplay(){
+    public void toggleSquareHighlight(int rank, int file){
         
-    }
-    
-    
-    
-    public void movePieceDisplay(Position p){
+        if(highlightedSquares[rank][file] == true){
+            highlightedSquares[rank][file] = false;
+            chessButtons[rank][file].setBackground(null);
+        }else{
+            highlightedSquares[rank][file] = true;
+            chessButtons[rank][file].setBackground(TRANSLUCENTBLUE);
+        }
+        repaint();
+        /*if(highlightedSquares[rank][file] == true){
+            highlightedSquares[rank][file] = false;
+        }else{
+            highlightedSquares[rank][file] = true;
+        }
         
+        repaint();
+*/
     }
     
-    public void getGUI(){
+    
+    public void placePieceDisplay(int rank, int file, String imagePath){
+        try{
+            BufferedImage pieceIcon = ImageIO.read(new File(imagePath));
+            chessButtons[rank][file].setIcon(new ImageIcon(pieceIcon));
+        }catch(Exception e){
+            System.err.println("Could not find piece image: " +e.getMessage());
+        }
     }
     
+    public void removePieceDisplay(int rank, int file){
+        chessButtons[rank][file].setIcon(null);
+    }
     
     @Override
     public void paintComponent(Graphics g){
         super.paintComponent(g);
         g.drawImage(boardImage, 0, 0, getWidth(), getHeight(), this);
+        
+        
     }
 }
