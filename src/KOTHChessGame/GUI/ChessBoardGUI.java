@@ -72,6 +72,7 @@ public class ChessBoardGUI extends JPanel{
         squareButton.setContentAreaFilled(false);
         squareButton.setBorderPainted(true);
         squareButton.setFocusPainted(true);
+        squareButton.setBackground(TRANSLUCENTBLUE);
 
         squareButton.addActionListener((ActionEvent e) -> {
             controller.clickedSquare(rank, file);
@@ -85,10 +86,10 @@ public class ChessBoardGUI extends JPanel{
         
         if(highlightedSquares[rank][file] == true){
             highlightedSquares[rank][file] = false;
-            chessButtons[rank][file].setBackground(null);
+            chessButtons[rank][file].setContentAreaFilled(false);
         }else{
             highlightedSquares[rank][file] = true;
-            chessButtons[rank][file].setBackground(TRANSLUCENTBLUE);
+            chessButtons[rank][file].setContentAreaFilled(true);
         }
         repaint();
         /*if(highlightedSquares[rank][file] == true){
