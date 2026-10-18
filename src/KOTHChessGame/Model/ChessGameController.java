@@ -6,6 +6,7 @@ import KOTHChessGame.ChessPieces.Knight;
 import KOTHChessGame.ChessPieces.Pawn;
 import KOTHChessGame.ChessPieces.Queen;
 import KOTHChessGame.ChessPieces.Rook;
+import KOTHChessGame.GUI.ChessBoardGUI;
 import java.io.BufferedWriter;
 import java.io.FileNotFoundException;
 import java.io.FileWriter;
@@ -20,6 +21,7 @@ public class ChessGameController {
     private PieceColor currentTurn;
     private int turn;
     private LinkedList<Position> actionLog = new LinkedList<Position>();
+    private ChessBoardGUI cbgui;
 
     public ChessGameController() {
         cb = new ChessBoard();
@@ -36,6 +38,14 @@ public class ChessGameController {
 
     public PieceColor getTurnColor() {
         return currentTurn;
+    }
+    
+    public void setView(ChessBoardGUI cbgui){
+        this.cbgui = cbgui;
+    }
+    
+    public ChessBoardGUI getView(){
+        return cbgui;
     }
 
     public void increaseTurn() {

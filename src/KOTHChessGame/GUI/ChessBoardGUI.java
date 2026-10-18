@@ -7,27 +7,21 @@ import KOTHChessGame.ChessPieces.Queen;
 import KOTHChessGame.Controller.ChessBoardEventController;
 import KOTHChessGame.Model.ChessBoard;
 import KOTHChessGame.Model.PieceColor;
-import KOTHChessGame.Model.Position;
 import java.awt.Color;
-import java.awt.Dimension;
 import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.GridLayout;
 import java.awt.Image;
-import java.awt.event.ActionEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
-import javax.swing.JButton;
 import javax.swing.JPanel;
 
 public class ChessBoardGUI extends JPanel{
     
-    public int panelWidth;
-    public int panelHeight;
+    public static final int PANELWIDTH = 1000;
+    public static final int PANELHEIGHT = 1000;
     private static final int RANKS = 8;
     private static final int FILES = 8;
     private static final Color TRANSLUCENTBLUE = new Color(63, 243, 235, 100);
@@ -41,13 +35,9 @@ public class ChessBoardGUI extends JPanel{
     
     
     public ChessBoardGUI(){
-        // displays chess board
-        // sets up grid buttons
-        controller = new ChessBoardEventController();
+        // displays chess board image
         
         boardImage = new ImageIcon(BOARDPNG).getImage();
-        panelWidth = getWidth();
-        panelHeight = getHeight();
         
         // initialize highlightedSquares array (stores which squares in the grid are highlighted)
         for(int i=0; i<RANKS; i++){
@@ -108,6 +98,13 @@ public class ChessBoardGUI extends JPanel{
         }
     }
     
+    public void setController(ChessBoardEventController controller){
+        this.controller = controller;
+    }
+    
+    public ChessBoardEventController getController(){
+        return controller;
+    }
     
     public void highlightBlue(int rank, int file){
         highlightedSquares[rank][file].setColored(true);
