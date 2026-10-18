@@ -2,7 +2,7 @@ package KOTHChessGame.Controller;
 
 import KOTHChessGame.Model.Position;
 
-public class ChessGUIEventController {
+public class ChessBoardEventController {
 
     public void clickedSquare(int rank, int file) {
         // test
