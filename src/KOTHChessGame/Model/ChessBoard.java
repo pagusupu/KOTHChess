@@ -1,5 +1,8 @@
 package KOTHChessGame.Model;
 
+import KOTHChessGame.ChessPieces.King;
+import KOTHChessGame.ChessPieces.Pawn;
+import KOTHChessGame.GUI.ChessBoardGUI;
 import java.util.ArrayList;
 
 public class ChessBoard {
@@ -10,11 +13,22 @@ public class ChessBoard {
 
     private ArrayList<ChessPiece> piecesOnBoard = new ArrayList<ChessPiece>();
     private ArrayList<ChessPiece> capturedPieces = new ArrayList<ChessPiece>();
+    
+    private ChessBoardGUI cbgui;
 
-    public ChessBoard() {
+    public ChessBoard(ChessBoardGUI cbgui) {
         pieces = new ChessPiece[8][8];
         rank = 8;
         file = 8;
+        this.cbgui = cbgui;
+    }
+    
+    public void setView(ChessBoardGUI cbgui){
+        this.cbgui = cbgui;
+    }
+    
+    public ChessBoardGUI getView(){
+        return cbgui;
     }
 
     public int getRanks() {
@@ -52,6 +66,19 @@ public class ChessBoard {
         for (int i = 0; i < rank; i++) {
             for (int j = 0; j < file; j++) {
                 bs[i][j] = this.getPieceAt(new Position(i, j));
+            }
+        }
+        return bs;
+    }
+    
+    public String[][] getBoardIcons(){
+        String[][] bs = new String[rank][file];
+        for(int i=0; i<rank; i++){
+            for(int j=0; j<rank; j++){
+                ChessPiece piece = getPieceAt(new Position(i, j));
+                if(piece != null){
+                    bs[i][j] = this.getPieceAt(new Position(i, j)).getIcon();
+                }
             }
         }
         return bs;
@@ -109,6 +136,47 @@ public class ChessBoard {
             throw new ChessGameException("Error removing piece: no piece found at position");
         }
     }
+    
+    private Position checkEnPassantCapture(Position source, Position target){
+        
+        // checks for a diagonal move by pawn to an unoccupied square
+        if(getPieceAt(source) instanceof Pawn pawn
+                // check if destination is unoccupied
+                && checkPosition(target) == SquareState.EMPTY){
+            
+                // check en passant scneario for both sides
+            if(getPieceAt(new Position(source.getRank(), source.getFile()+1)) instanceof Pawn pawn2
+                    && pawn.getColor() != pawn2.getColor()
+                    && source.getFile() - target.getFile() == -1
+                    && pawn2.isEnPassant()){
+                
+                return new Position(source.getRank(), source.getFile()+1);
+                
+            }else if(getPieceAt(new Position(source.getRank(), source.getFile()-1)) instanceof Pawn pawn2
+                    && pawn.getColor() != pawn2.getColor()
+                    && source.getFile() - target.getFile() == 1
+                    && pawn2.isEnPassant()){ 
+                
+                return new Position(source.getRank(), source.getFile()-1);
+                
+            }
+        }
+                
+        return null;
+    }
+    
+    private Position checkCastling(Position source, Position target){
+        if(getPieceAt(source) instanceof King){
+            
+            // kingside castling
+            if(target.getFile() - source.getFile() == 2){
+                
+            }
+            
+            
+        }
+        return null;
+    }
 
     public void movePiece(Position source, Position target, ArrayList<Position> validMoves) {
         // Move a piece, if target location has an opposing piece, capture it
@@ -117,9 +185,22 @@ public class ChessBoard {
                 if (checkPosition(target) == SquareState.OCCUPIED) {
                     capturePiece(target);
                 }
+                else {
+                    // special en passant check
+                    Position enPawn = checkEnPassantCapture(source, target);
+                        if(enPawn != null){
+                            capturePiece(enPawn);
+                    }
+                    
+                    // special castling check to move rook
+                    
+                }
+                
+                
                 placePiece(getPieceAt(source), target);
                 getPieceAt(target).increaseTurnCount();
                 removePiece(source);
+                
             } else {
                 throw new ChessGameException("Error: Not a valid move. Try again");
             }
@@ -156,6 +237,19 @@ public class ChessBoard {
             }
         }
         return false;
+    }
+    
+    public void clearEnPassant(PieceColor color){
+        for (int i = 0; i < rank; i++) {
+            for (int j = 0; j < file; j++) {
+                if (pieces[i][j] != null 
+                        && pieces[i][j] instanceof Pawn pwn 
+                        && pwn.getColor() == color) {
+                    pwn.setEnPassant(false);
+                }
+
+            }
+        }
     }
 
     public void clearBoard() {

@@ -1,5 +1,6 @@
 package KOTHChessGame.Model;
 
+import KOTHChessGame.Application.UI;
 import KOTHChessGame.ChessPieces.Bishop;
 import KOTHChessGame.ChessPieces.King;
 import KOTHChessGame.ChessPieces.Knight;
@@ -11,6 +12,7 @@ import java.io.BufferedWriter;
 import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
+import static java.lang.Math.abs;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.Scanner;
@@ -22,9 +24,12 @@ public class ChessGameController {
     private int turn;
     private LinkedList<Position> actionLog = new LinkedList<Position>();
     private ChessBoardGUI cbgui;
+    private Position selectedSquare;
+    private boolean gameEnded;
 
-    public ChessGameController() {
-        cb = new ChessBoard();
+    public ChessGameController(ChessBoardGUI cbgui) {
+        cb = new ChessBoard(cbgui);
+        this.cbgui = cbgui;
         initializeBoard();
     }
 
@@ -94,7 +99,7 @@ public class ChessGameController {
         // if a move will cause an illegal state i.e. check
         // Return an ArrayList of only legal moves
         ArrayList<Position> testedMoves = new ArrayList();
-        ChessBoard sb = new ChessBoard();
+        ChessBoard sb = new ChessBoard(cbgui);
 
         for (int i = 0; i < validMoves.size(); i++) {
             sb.clearBoard();
@@ -238,6 +243,146 @@ public class ChessGameController {
         return false;
     }
 
+    
+    public boolean checkGameEnd(){
+        if(gameEnded){
+            throw new ChessGameException("Game has ended.");
+        }else{
+            return false;
+        }
+    }
+    
+    private boolean checkDoubleSquarePawnMove(ChessPiece p, Position source, Position dest){
+        if(p instanceof Pawn pwn && (abs(source.getRank() - dest.getRank()) == 2))  {  
+        
+                pwn.setEnPassant(true);
+                System.out.println("marked en passant");
+                return true;
+            }  
+        return false;
+    }
+    
+    
+    
+    // placeholder method
+    public void promotionEvent(Position pos){
+        Scanner scan = new Scanner(System.in);
+        System.out.println("");
+        System.out.println("Select which piece to promote to:");
+        System.out.println("Bishop (b)");
+        System.out.println("Knight (n)");
+        System.out.println("Queen  (q)");
+        System.out.println("Rook   (r)");
+        while (isPromotable(pos)) {
+            try {
+                promotePiece(pos, scan);
+            } catch (ChessGameException e) {
+                System.out.println(e.getMessage());
+            }
+        }
+    }
+    
+    public void callPosition(int rank, int file){
+        Position pos = new Position(rank, file);
+        ArrayList<Position> validMoves = new ArrayList<Position>();
+        try{
+            // throws an error if game has ended
+            checkGameEnd();
+            
+            // select piece phase
+            if(selectedSquare == null){
+                try {
+                    // check for valid moves of selected square
+                    validMoves = simulateMoves(pos, selectPiece(pos));
+                } catch (ChessGameException e) {
+                    System.out.println(e.getMessage());
+                    System.out.println("To move: ");
+                }
+                // if selected piece has valid move(s)
+                if(!validMoves.isEmpty()){
+                    // move into "piece is selected" phase
+                    selectedSquare = pos;
+                    System.out.println("Target: ");
+                    boolean[][] highlights = new boolean[cb.getRanks()][cb.getFiles()];
+                    for(Position p : validMoves){
+                        highlights[p.getRank()][p.getFile()] = true;
+                    }
+                    cbgui.updateValidMoveDisplay(highlights);
+                }
+
+                // "piece is selected" phase
+            }else{
+                validMoves = simulateMoves(selectedSquare, selectPiece(selectedSquare));
+                // cancel move if the same square is selected
+                if(pos.equals(selectedSquare)){
+
+                    selectedSquare = null;
+                    cbgui.clearAllHighlights();
+                    System.out.println("Piece deselected");
+                    System.out.println("To move: ");
+
+                }else if(cb.containsTarget(pos, validMoves)) {
+                    try {
+                        confirmMove(selectedSquare, pos, validMoves);
+                        System.out.println("Pawn moved by " +abs(selectedSquare.getRank() - pos.getRank())+ " squares");
+                        if(cb.getPieceAt(pos) instanceof Pawn){
+                            System.out.println("Pawn is moved");
+                        }
+
+                        // mark pawn for en passant
+                        checkDoubleSquarePawnMove(cb.getPieceAt(pos), selectedSquare, pos);
+                        
+                        
+                        // check promotion
+                        if (isPromotable(pos)) {
+                            promotionEvent(pos);
+                        }
+                        
+                        
+                        increaseTurn();
+                        System.out.println("Turn incremented");
+                        
+                        // clear all en passant on current player's pawns
+                        cb.clearEnPassant(currentTurn);
+
+                        boolean[][] highlights = new boolean[cb.getRanks()][cb.getFiles()];
+                        highlights[selectedSquare.getRank()][selectedSquare.getFile()] = true;
+                        highlights[pos.getRank()][pos.getFile()] = true;
+                        cbgui.updateRecentMoveDisplay(highlights);
+                        cbgui.updatePieceIcons(cb.getBoardIcons());
+
+                        if(isCheckmate()){
+                            gameEnded = true;
+                            if (getTurnColor() == PieceColor.WHITE) {
+                                System.out.println("BLACK WINS!");
+                            } else {
+                                System.out.println("WHITE WINS!");
+                            }
+                                saveActionLog(getActionLog());
+                        }else if(isChecked(getBoard())) {
+                            System.out.println("");
+                            System.out.println("IN CHECK");
+                        }else{
+                            System.out.println("To move: ");
+                        }
+
+
+
+                    } catch (ChessGameException e) {
+                        System.out.println(e.getMessage());
+                        cbgui.clearAllHighlights();
+
+                    }
+                    selectedSquare = null;
+                    validMoves = null;
+                }
+            }
+        } catch (ChessGameException e){
+            System.out.println(e.getMessage());
+        }
+       
+    }
+
     private void initializeBoard() {
         // place pawns
         for (int i = 0; i < cb.getFiles(); i++) {
@@ -268,6 +413,93 @@ public class ChessGameController {
         // set first turn to White
         currentTurn = PieceColor.WHITE;
         turn = 1;
+        cbgui.updatePieceIcons(cb.getBoardIcons());
     }
+    
+    /*
+    public void runGame(Scanner scan){
+        
+        while (!isCheckmate()) {
+            Position toMove = null;
+            Position target = null;
+            ArrayList<Position> validMoves = new ArrayList<Position>();
 
+            // Select piece to move 
+            UI.printMatch(getBoard(), this);
+            cbgui.updatePieceIcons(cb.getBoardIcons());
+            
+            if (isChecked(getBoard())) {
+                System.out.println("");
+                System.out.println("IN CHECK");
+            }
+            System.out.print("To move: ");
+
+            while (validMoves.isEmpty()) {
+                toMove = UI.readPosition(scan);
+                try {
+                    validMoves = simulateMoves(toMove, selectPiece(toMove));
+                } catch (ChessGameException e) {
+                    System.out.println(e.getMessage());
+                    System.out.print("To move: ");
+                }
+            }
+            System.out.println("");
+
+            // Select space to move to
+            UI.printBoard(cb.getBoardState(), validMoves);
+            cbgui.updatePieceIcons(cb.getBoardIcons());
+            
+            boolean[][] highlights = new boolean[cb.getRanks()][cb.getFiles()];
+            for(Position p : validMoves){
+                highlights[p.getRank()][p.getFile()] = true;
+            }
+            cbgui.updateValidMoveDisplay(highlights);
+            
+            System.out.print("Target: ");
+
+            while (!getBoard().containsTarget(target, validMoves)) {
+                target = UI.readPosition(scan);
+                try {
+                    confirmMove(toMove, target, validMoves);
+                } catch (ChessGameException e) {
+                    System.out.println(e.getMessage());
+                    System.out.print("Target: ");
+                }
+            }
+
+            if (isPromotable(target)) {
+                System.out.println("");
+                System.out.println("Select which piece to promote to:");
+                System.out.println("Bishop (b)");
+                System.out.println("Knight (n)");
+                System.out.println("Queen  (q)");
+                System.out.println("Rook   (r)");
+                while (isPromotable(target)) {
+                    try {
+                        promotePiece(target, scan);
+                    } catch (ChessGameException e) {
+                        System.out.println(e.getMessage());
+                    }
+                }
+            }
+            increaseTurn();
+            System.out.println("");
+            
+            highlights = new boolean[cb.getRanks()][cb.getFiles()];
+            highlights[toMove.getRank()][toMove.getFile()] = true;
+            highlights[target.getRank()][target.getFile()] = true;
+            cbgui.updateRecentMoveDisplay(highlights);
+            cbgui.updatePieceIcons(cb.getBoardIcons());
+        }
+
+        if (getTurnColor() == PieceColor.WHITE) {
+            System.out.println("BLACK WINS!");
+        } else {
+            System.out.println("WHITE WINS!");
+        }
+        saveActionLog(getActionLog());
+        
+    }
+    */
 }
+

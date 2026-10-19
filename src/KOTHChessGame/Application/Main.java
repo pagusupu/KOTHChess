@@ -12,7 +12,7 @@ public class Main extends JFrame{
     public static void main(String[] args) {
         JFrame f = new JFrame("KOTH Chess");
         ChessBoardGUI chessPanel = new ChessBoardGUI();
-        ChessBoardEventController cbec = new ChessBoardEventController(chessPanel, new ChessGameController());
+        ChessBoardEventController cbec = new ChessBoardEventController(chessPanel, new ChessGameController(chessPanel));
         f.add(chessPanel);
         
         f.setLocation(0,0);

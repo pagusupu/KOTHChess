@@ -1,20 +1,40 @@
 package KOTHChessGame.Application;
 
+import KOTHChessGame.Controller.ChessBoardEventController;
+import KOTHChessGame.GUI.ChessBoardGUI;
 import KOTHChessGame.Model.ChessGameController;
 import KOTHChessGame.Model.ChessGameException;
 import KOTHChessGame.Model.PieceColor;
 import KOTHChessGame.Model.Position;
+import java.awt.Dimension;
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.Scanner;
 import java.util.ArrayList;
+import javax.swing.JFrame;
 
 public class ChessProgram {
 
     public static void main(String[] args) {
-        ChessGameController cgr = new ChessGameController();
+        
+        JFrame f = new JFrame("KOTH Chess");
+        ChessBoardGUI chessPanel = new ChessBoardGUI();        
+        
+        f.add(chessPanel);
+        
+        f.setLocation(0,0);
+        f.setPreferredSize(new Dimension(ChessBoardGUI.PANELWIDTH, ChessBoardGUI.PANELHEIGHT));
+        f.setResizable(false);
+        f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        f.pack();
+        f.setVisible(true);
+        
+        ChessGameController cgr = new ChessGameController(chessPanel);
+        ChessBoardEventController cbec = new ChessBoardEventController(chessPanel, cgr);
+
+        
         Scanner scan = new Scanner(System.in);
 
         System.out.println("Select:");
@@ -25,6 +45,10 @@ public class ChessProgram {
 
         // Chess game
         if (input.equalsIgnoreCase("a")) {
+            
+            //cgr.runGame(scan);
+            
+            /*
             while (!cgr.isCheckmate()) {
                 Position toMove = null;
                 Position target = null;
@@ -88,7 +112,7 @@ public class ChessProgram {
                 System.out.println("WHITE WINS!");
             }
             cgr.saveActionLog(cgr.getActionLog());
-
+            */
             // Replay game
         } else if (input.equalsIgnoreCase("b")) {
             Position toMove, target;

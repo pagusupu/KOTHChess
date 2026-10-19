@@ -1,12 +1,6 @@
 
-package KOTHChessGame.GUI;
-
-import KOTHChessGame.ChessPieces.Knight;
-import KOTHChessGame.ChessPieces.Pawn;
-import KOTHChessGame.ChessPieces.Queen;
+package KOTHChessGame.GUI; 
 import KOTHChessGame.Controller.ChessBoardEventController;
-import KOTHChessGame.Model.ChessBoard;
-import KOTHChessGame.Model.PieceColor;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Image;
@@ -22,8 +16,8 @@ public class ChessBoardGUI extends JPanel{
     
     public static final int PANELWIDTH = 1000;
     public static final int PANELHEIGHT = 1000;
-    private static final int RANKS = 8;
-    private static final int FILES = 8;
+    public static final int RANKS = 8;
+    public static final int FILES = 8;
     private static final Color TRANSLUCENTBLUE = new Color(63, 243, 235, 100);
     private static final Color TRANSLUCENTGREEN = new Color(187, 253, 49, 100);
     private static final String BOARDPNG = "./resources/BoardAssets/ChessBoard.png";
@@ -46,38 +40,10 @@ public class ChessBoardGUI extends JPanel{
             }
         }
         
-        this.addMouseListener(new MouseListener() {
-            @Override
-            public void mouseClicked(MouseEvent e) {
-            }
-
-            @Override
-            public void mousePressed(MouseEvent e) {
-                int squareRank = 7-(e.getY()/(getHeight()/RANKS));
-                int squareFile = e.getX()/(getWidth()/FILES);
-                
-                controller.clickedSquare(squareRank, squareFile);
-                
-                // test
-                highlightGreen(squareRank, squareFile);
-            }
-
-            @Override
-            public void mouseReleased(MouseEvent e) {
-            }
-
-            @Override
-            public void mouseEntered(MouseEvent e) {
-            }
-
-            @Override
-            public void mouseExited(MouseEvent e) {
-            }
-        });
-        
 
         
         // test
+        /*
         ChessBoard cb = new ChessBoard();
         Pawn pawn = new Pawn(cb, PieceColor.WHITE);
         Queen qn = new Queen(cb, PieceColor.BLACK);
@@ -96,6 +62,7 @@ public class ChessBoardGUI extends JPanel{
             placePieceDisplay(0, i, qn.getIcon());
             placePieceDisplay(i, i, kn.getIcon());
         }
+        */
     }
     
     public void setController(ChessBoardEventController controller){
@@ -109,20 +76,22 @@ public class ChessBoardGUI extends JPanel{
     public void highlightBlue(int rank, int file){
         highlightedSquares[rank][file].setColored(true);
         highlightedSquares[rank][file].setHighlightColor(TRANSLUCENTBLUE);
-        repaint();
     }
     
     public void highlightGreen(int rank, int file){
         highlightedSquares[rank][file].setColored(true);
         highlightedSquares[rank][file].setHighlightColor(TRANSLUCENTGREEN);
-        repaint();
+    }
+    
+    public void clearHighlight(int rank, int file){
+        highlightedSquares[rank][file].setColored(false);
+        highlightedSquares[rank][file].setHighlightColor(null);
     }
     
     public void clearAllHighlights(){
         for(int i=0; i<RANKS; i++){
             for(int j=0; j<FILES; j++){
-                highlightedSquares[i][j].setColored(false);
-                highlightedSquares[i][j].setHighlightColor(null);
+                clearHighlight(i, j);
             }
         }
         repaint();
@@ -131,14 +100,51 @@ public class ChessBoardGUI extends JPanel{
     public void placePieceDisplay(int rank, int file, String imagePath){
         try{
             pieceImages[rank][file] = ImageIO.read(new File(imagePath));
-            repaint();
         }catch(Exception e){
-                System.err.println("Could not find piece image: " +e.getMessage());
-            }
+            System.err.println("Could not find piece image: " +e.getMessage());
+        }
     }
     
     public void removePieceDisplay(int rank, int file){
         pieceImages[rank][file] = null;
+    }
+    
+    public void updatePieceIcons(String[][] images){
+        for(int i=0; i<RANKS; i++){
+            for(int j=0; j<FILES; j++){
+                if(images[i][j] != null){
+                    placePieceDisplay(i, j, images[i][j]);
+                }else{
+                    removePieceDisplay(i, j);
+                }
+            }
+        }
+        repaint();
+    }
+    
+    public void updateValidMoveDisplay(boolean[][] highlights){
+        for(int i=0; i<RANKS; i++){
+            for(int j=0; j<FILES; j++){
+                if(highlights[i][j]){
+                    highlightBlue(i, j);
+                }else{
+                    clearHighlight(i, j);
+                }
+            }
+        }
+        repaint();
+    }
+    
+    public void updateRecentMoveDisplay(boolean[][] highlights){
+        for(int i=0; i<RANKS; i++){
+            for(int j=0; j<FILES; j++){
+                if(highlights[i][j]){
+                    highlightGreen(i, j);
+                }else{
+                    clearHighlight(i, j);
+                }
+            }
+        }
         repaint();
     }
     
