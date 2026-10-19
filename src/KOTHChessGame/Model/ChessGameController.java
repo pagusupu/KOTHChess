@@ -28,7 +28,7 @@ public class ChessGameController {
     private boolean gameEnded;
 
     public ChessGameController(ChessBoardGUI cbgui) {
-        cb = new ChessBoard(cbgui);
+        cb = new ChessBoard();
         this.cbgui = cbgui;
         initializeBoard();
     }
@@ -70,17 +70,17 @@ public class ChessGameController {
         // processes a given position if it is a valid piece to move. 
         // if true, returns an ArrayList of possible moves
         if (cb.getPieceAt(pos) == null) {
-            throw new ChessGameException("Position is empty. Try again");
+            throw new ChessGameException("selectPiece: Position is empty. Try again");
         }
 
         if (cb.getPieceAt(pos).getColor() != currentTurn) {
-            throw new ChessGameException("Position contains opponent piece. Try again");
+            throw new ChessGameException("selectPiece: Position contains opponent piece. Try again");
         }
 
         ArrayList<Position> pieceMoves = cb.getPieceAt(pos).validMoves(pos);
 
         if (pieceMoves.isEmpty()) {
-            throw new ChessGameException("Selected piece has no valid moves. Try again");
+            throw new ChessGameException("selectPiece: Selected piece has no valid moves. Try again");
         }
 
         return pieceMoves;
@@ -98,8 +98,8 @@ public class ChessGameController {
         // Test each of a pieces valid moves to check
         // if a move will cause an illegal state i.e. check
         // Return an ArrayList of only legal moves
-        ArrayList<Position> testedMoves = new ArrayList();
-        ChessBoard sb = new ChessBoard(cbgui);
+        ArrayList<Position> testedMoves = new ArrayList<Position>();
+        ChessBoard sb = new ChessBoard();
 
         for (int i = 0; i < validMoves.size(); i++) {
             sb.clearBoard();
@@ -116,6 +116,34 @@ public class ChessGameController {
                 testedMoves.add(validMoves.get(i));
             }
         }
+        
+        // special castling check: squares at and between king's movement must not be occupiable
+        /*
+        if(cb.getPieceAt(source) instanceof King k){
+            
+            for(Position p : testedMoves){
+                // kingside castle check
+                if(p.getFile() - source.getFile() == 2){
+                    for(int i = 0; i <= 2 ; i++){
+                        if(cb.canBeOccupied(k.getColor(), new Position(source.getRank(), source.getFile()+i))){
+                            testedMoves.remove(p);
+                        }
+                    }
+                }
+                
+                // queenside castle check
+                if(source.getFile() - p.getFile() == 2){
+                    for(int i = 0; i <= 2 ; i++){
+                        if(cb.canBeOccupied(k.getColor(), new Position(source.getRank(), source.getFile()-i))){
+                            testedMoves.remove(p);
+                        }
+                    }
+                }
+            }
+        }
+        */
+        
+        
         return testedMoves;
     }
 
@@ -129,8 +157,10 @@ public class ChessGameController {
             for (int i = 0; i < cb.getRanks(); i++) {
                 for (int j = 0; j < cb.getFiles(); j++) {
                     Position pos = new Position(i, j);
+                    System.out.println("creating position " +pos.toString());
                     if (cb.getPieceAt(pos) != null && cb.getPieceAt(pos).color == currentTurn) {
                         if (!simulateMoves(pos, cb.getPieceAt(pos).validMoves(pos)).isEmpty()) {
+                            System.out.println("checkmate verification complete");
                             return false;
                         }
                     }
@@ -216,7 +246,7 @@ public class ChessGameController {
             } else if (input.equalsIgnoreCase("r")) {
                 piece = new Rook(cb, color);
             } else {
-                throw new ChessGameException("Not a piece. Try again");
+                throw new ChessGameException("promotePiece: Not a piece. Try again");
             }
 
             cb.removePiece(target);
@@ -246,7 +276,7 @@ public class ChessGameController {
     
     public boolean checkGameEnd(){
         if(gameEnded){
-            throw new ChessGameException("Game has ended.");
+            throw new ChessGameException("checkGameEnd: Game has ended.");
         }else{
             return false;
         }
@@ -256,7 +286,6 @@ public class ChessGameController {
         if(p instanceof Pawn pwn && (abs(source.getRank() - dest.getRank()) == 2))  {  
         
                 pwn.setEnPassant(true);
-                System.out.println("marked en passant");
                 return true;
             }  
         return false;
@@ -280,6 +309,10 @@ public class ChessGameController {
                 System.out.println(e.getMessage());
             }
         }
+    }
+    
+    public void forfeit(){
+        // TODO
     }
     
     public void callPosition(int rank, int file){
@@ -324,10 +357,6 @@ public class ChessGameController {
                 }else if(cb.containsTarget(pos, validMoves)) {
                     try {
                         confirmMove(selectedSquare, pos, validMoves);
-                        System.out.println("Pawn moved by " +abs(selectedSquare.getRank() - pos.getRank())+ " squares");
-                        if(cb.getPieceAt(pos) instanceof Pawn){
-                            System.out.println("Pawn is moved");
-                        }
 
                         // mark pawn for en passant
                         checkDoubleSquarePawnMove(cb.getPieceAt(pos), selectedSquare, pos);
@@ -350,7 +379,9 @@ public class ChessGameController {
                         highlights[pos.getRank()][pos.getFile()] = true;
                         cbgui.updateRecentMoveDisplay(highlights);
                         cbgui.updatePieceIcons(cb.getBoardIcons());
-
+                        
+                        System.out.println("GUI updated");
+                        
                         if(isCheckmate()){
                             gameEnded = true;
                             if (getTurnColor() == PieceColor.WHITE) {
@@ -359,7 +390,7 @@ public class ChessGameController {
                                 System.out.println("WHITE WINS!");
                             }
                                 saveActionLog(getActionLog());
-                        }else if(isChecked(getBoard())) {
+                        }else if(isChecked(cb)) {
                             System.out.println("");
                             System.out.println("IN CHECK");
                         }else{
@@ -416,90 +447,5 @@ public class ChessGameController {
         cbgui.updatePieceIcons(cb.getBoardIcons());
     }
     
-    /*
-    public void runGame(Scanner scan){
-        
-        while (!isCheckmate()) {
-            Position toMove = null;
-            Position target = null;
-            ArrayList<Position> validMoves = new ArrayList<Position>();
-
-            // Select piece to move 
-            UI.printMatch(getBoard(), this);
-            cbgui.updatePieceIcons(cb.getBoardIcons());
-            
-            if (isChecked(getBoard())) {
-                System.out.println("");
-                System.out.println("IN CHECK");
-            }
-            System.out.print("To move: ");
-
-            while (validMoves.isEmpty()) {
-                toMove = UI.readPosition(scan);
-                try {
-                    validMoves = simulateMoves(toMove, selectPiece(toMove));
-                } catch (ChessGameException e) {
-                    System.out.println(e.getMessage());
-                    System.out.print("To move: ");
-                }
-            }
-            System.out.println("");
-
-            // Select space to move to
-            UI.printBoard(cb.getBoardState(), validMoves);
-            cbgui.updatePieceIcons(cb.getBoardIcons());
-            
-            boolean[][] highlights = new boolean[cb.getRanks()][cb.getFiles()];
-            for(Position p : validMoves){
-                highlights[p.getRank()][p.getFile()] = true;
-            }
-            cbgui.updateValidMoveDisplay(highlights);
-            
-            System.out.print("Target: ");
-
-            while (!getBoard().containsTarget(target, validMoves)) {
-                target = UI.readPosition(scan);
-                try {
-                    confirmMove(toMove, target, validMoves);
-                } catch (ChessGameException e) {
-                    System.out.println(e.getMessage());
-                    System.out.print("Target: ");
-                }
-            }
-
-            if (isPromotable(target)) {
-                System.out.println("");
-                System.out.println("Select which piece to promote to:");
-                System.out.println("Bishop (b)");
-                System.out.println("Knight (n)");
-                System.out.println("Queen  (q)");
-                System.out.println("Rook   (r)");
-                while (isPromotable(target)) {
-                    try {
-                        promotePiece(target, scan);
-                    } catch (ChessGameException e) {
-                        System.out.println(e.getMessage());
-                    }
-                }
-            }
-            increaseTurn();
-            System.out.println("");
-            
-            highlights = new boolean[cb.getRanks()][cb.getFiles()];
-            highlights[toMove.getRank()][toMove.getFile()] = true;
-            highlights[target.getRank()][target.getFile()] = true;
-            cbgui.updateRecentMoveDisplay(highlights);
-            cbgui.updatePieceIcons(cb.getBoardIcons());
-        }
-
-        if (getTurnColor() == PieceColor.WHITE) {
-            System.out.println("BLACK WINS!");
-        } else {
-            System.out.println("WHITE WINS!");
-        }
-        saveActionLog(getActionLog());
-        
-    }
-    */
 }
 

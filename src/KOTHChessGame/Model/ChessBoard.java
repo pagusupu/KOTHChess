@@ -2,7 +2,7 @@ package KOTHChessGame.Model;
 
 import KOTHChessGame.ChessPieces.King;
 import KOTHChessGame.ChessPieces.Pawn;
-import KOTHChessGame.GUI.ChessBoardGUI;
+import static java.lang.Math.abs;
 import java.util.ArrayList;
 
 public class ChessBoard {
@@ -14,21 +14,10 @@ public class ChessBoard {
     private ArrayList<ChessPiece> piecesOnBoard = new ArrayList<ChessPiece>();
     private ArrayList<ChessPiece> capturedPieces = new ArrayList<ChessPiece>();
     
-    private ChessBoardGUI cbgui;
-
-    public ChessBoard(ChessBoardGUI cbgui) {
+    public ChessBoard() {
         pieces = new ChessPiece[8][8];
         rank = 8;
         file = 8;
-        this.cbgui = cbgui;
-    }
-    
-    public void setView(ChessBoardGUI cbgui){
-        this.cbgui = cbgui;
-    }
-    
-    public ChessBoardGUI getView(){
-        return cbgui;
     }
 
     public int getRanks() {
@@ -51,7 +40,7 @@ public class ChessBoard {
         // Returns chess piece at given position 
         try {
             if (checkPosition(pos) == SquareState.OUT_OF_BOUNDS) {
-                throw new ChessGameException("Error: Position not in board");
+                throw new ChessGameException("getPieceAt: Error: Position not in board\nPosition checked: " +pos.toString());
             }
         } catch (ChessGameException e) {
             System.out.println(e);
@@ -100,25 +89,25 @@ public class ChessBoard {
         // Initializes a ChessPiece object on the board and starting position
         // Return an error if piece is not successfully placed (square is occupied) or if position is invalid
         if (checkPosition(pos) == SquareState.OUT_OF_BOUNDS) {
-            throw new ChessGameException("Error: Position not in board");
+            throw new ChessGameException("placePiece: Error: Position not in board");
         }
         if (getPieceAt(pos) == null) {
             pieces[pos.getRank()][pos.getFile()] = piece;
             piecesOnBoard.add(piece);
         } else {
-            throw new ChessGameException("Error placing piece: position is occupied");
+            throw new ChessGameException("placePiece: Error placing piece: position is occupied");
         }
     }
 
     public void removePiece(Position pos) {
         if (checkPosition(pos) == SquareState.OUT_OF_BOUNDS) {
-            throw new ChessGameException("Error: Position not in board");
+            throw new ChessGameException("removePiece: Error: Position not in board");
         }
         if (getPieceAt(pos) != null) {
             piecesOnBoard.remove(getPieceAt(pos));
             pieces[pos.getRank()][pos.getFile()] = null;
         } else {
-            throw new ChessGameException("Error removing piece: no piece found at position");
+            throw new ChessGameException("removePiece: Error removing piece: no piece found at position");
         }
     }
 
@@ -126,14 +115,14 @@ public class ChessBoard {
         // Removes a ChessPiece object from the board and adds it to capturedPieces
         // Return an error if piece is not successfully removed, or if position is invalid
         if (checkPosition(pos) == SquareState.OUT_OF_BOUNDS) {
-            throw new ChessGameException("Error: Position not in board");
+            throw new ChessGameException("capturePiece: Error: Position not in board");
         }
         if (getPieceAt(pos) != null) {
             capturedPieces.add(getPieceAt(pos));
             piecesOnBoard.remove(getPieceAt(pos));
             pieces[pos.getRank()][pos.getFile()] = null;
         } else {
-            throw new ChessGameException("Error removing piece: no piece found at position");
+            throw new ChessGameException("capturePiece: Error removing piece: no piece found at position");
         }
     }
     
@@ -165,17 +154,24 @@ public class ChessBoard {
         return null;
     }
     
-    private Position checkCastling(Position source, Position target){
-        if(getPieceAt(source) instanceof King){
-            
-            // kingside castling
-            if(target.getFile() - source.getFile() == 2){
-                
-            }
-            
-            
+    private void rookCastleMove(Position source, Position target){
+        ArrayList<Position> vm = new ArrayList<Position>();
+        Position p;
+        
+        // kingside castling
+        if(target.getFile() - source.getFile() == 2){
+            p = new Position(source.getRank(), source.getFile()+3);
+            vm.add(p);
+            movePiece(new Position(source.getRank(), source.getFile()+1), p, vm);
         }
-        return null;
+
+        // queenside castling
+        else if(source.getFile() - target.getFile() == 2){
+            p = new Position(source.getRank(), source.getFile()-4);
+            vm.add(p);
+            movePiece(new Position(source.getRank(), source.getFile()-1), p, vm);
+        }
+        
     }
 
     public void movePiece(Position source, Position target, ArrayList<Position> validMoves) {
@@ -186,23 +182,48 @@ public class ChessBoard {
                     capturePiece(target);
                 }
                 else {
-                    // special en passant check
+                    // if move is an en passant capture
                     Position enPawn = checkEnPassantCapture(source, target);
-                        if(enPawn != null){
+                    if(enPawn != null){
                             capturePiece(enPawn);
                     }
-                    
-                    // special castling check to move rook
-                    
+                    // if move is a castle; moves the rook
+                    else if( getPieceAt(source) instanceof King ){
+                        Position rookSource;
+                        Position rookTarget;
+                        System.out.println("castling logic triggered");
+                        
+                        // kingside castling
+                        if(target.getFile() - source.getFile() == 2){
+                            rookSource = new Position(source.getRank(), source.getFile()+3);
+                            rookTarget = new Position(source.getRank(), source.getFile()+1);
+                            
+                            placePiece(getPieceAt(rookSource), rookTarget);
+                            getPieceAt(rookTarget).increaseTurnCount();
+                            removePiece(rookSource);
+                        }
+
+                        // queenside castling
+                        else if(source.getFile() - target.getFile() == 2){
+                            rookSource = new Position(source.getRank(), source.getFile()-4);
+                            rookTarget = new Position(source.getRank(), source.getFile()-1);
+                            
+                            placePiece(getPieceAt(rookSource), rookTarget);
+                            getPieceAt(rookTarget).increaseTurnCount();
+                            removePiece(rookSource);
+                            
+                        }
+                        
+                            //rookCastleMove(source, target);
+                        }
                 }
-                
                 
                 placePiece(getPieceAt(source), target);
                 getPieceAt(target).increaseTurnCount();
                 removePiece(source);
                 
             } else {
-                throw new ChessGameException("Error: Not a valid move. Try again");
+                throw new ChessGameException("movePiece: Error: Not a valid move. Try again");
             }
         }
     }
