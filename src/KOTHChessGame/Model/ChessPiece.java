@@ -45,5 +45,6 @@ public abstract class ChessPiece{
     public abstract ChessPiece copy(ChessBoard cb);
 
     public abstract ArrayList<Position> validMoves(Position pos);
-
+    
+    public abstract String toString();
 }

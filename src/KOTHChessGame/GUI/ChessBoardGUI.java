@@ -14,8 +14,8 @@ import javax.swing.JPanel;
 
 public class ChessBoardGUI extends JPanel{
     
-    public static final int PANELWIDTH = 1000;
-    public static final int PANELHEIGHT = 1000;
+    public static final int PANELWIDTH = 960;
+    public static final int PANELHEIGHT = 960;
     public static final int RANKS = 8;
     public static final int FILES = 8;
     private static final Color TRANSLUCENTBLUE = new Color(63, 243, 235, 100);
@@ -130,14 +130,13 @@ public class ChessBoardGUI extends JPanel{
     }
     
     public void showPromotionMenu(int rank, int file){
-        String[] promotions = {"Bishop", "Knight", "Queen", "Rook"};
-        String promotedPiece = (String)JOptionPane.showInputDialog(null, "Choose promotion piece", "Maze Files", JOptionPane.PLAIN_MESSAGE, null, promotions, null );
+        String[] promotions = {"Queen", "Bishop", "Knight", "Rook"};
+        String promotedPiece = (String)JOptionPane.showInputDialog(null, "Choose promotion piece", "Promotion ", JOptionPane.PLAIN_MESSAGE, null, promotions, null );
         if(promotedPiece != null){
             getController().signalPromotion(promotedPiece, rank, file);
         }else{
             getController().signalPromotion("Queen", rank, file);
         }
-        
     }
     
     @Override

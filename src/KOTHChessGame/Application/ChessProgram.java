@@ -20,23 +20,13 @@ public class ChessProgram {
 
     public static void main(String[] args) {
         
-        JFrame f = new JFrame("KOTH Chess");
         
-        ChessBoardGUI chessPanel = new ChessBoardGUI();
-        ChessGameGUI gameWindow = new ChessGameGUI(chessPanel); 
         
-        f.add(chessPanel);
+        MainMenu main = new MainMenu();
         
-        f.setLocation(0,0);
-        f.setPreferredSize(new Dimension(ChessBoardGUI.PANELWIDTH, ChessBoardGUI.PANELHEIGHT));
-        f.setResizable(false);
-        f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        f.pack();
-        f.setVisible(true);
         
-        ChessGameController cgr = new ChessGameController(chessPanel);
-        ChessBoardEventController cbec = new ChessBoardEventController(chessPanel, cgr);
 
+        
         
         Scanner scan = new Scanner(System.in);
 
@@ -44,14 +34,14 @@ public class ChessProgram {
         System.out.println("Start game (A)");
         System.out.println("Replay game (B)");
 
-        String input = scan.nextLine().trim();
+        String input = "a";
 
         // Chess game
         if (input.equalsIgnoreCase("a")) {
             
             //cgr.runGame(scan);
-            
             /*
+            
             while (!cgr.isCheckmate()) {
                 Position toMove = null;
                 Position target = null;
@@ -118,6 +108,8 @@ public class ChessProgram {
             */
             // Replay game
         } else if (input.equalsIgnoreCase("b")) {
+            
+            /*
             Position toMove, target;
             ArrayList<Position> validMoves;
             BufferedReader br = null;
@@ -172,8 +164,10 @@ public class ChessProgram {
                     }
                 }
             }
+*/
         } else {
             System.out.println("Not a mode.");
         }
+       
     }
 }

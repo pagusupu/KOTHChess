@@ -73,7 +73,7 @@ public class King extends ChessPiece {
 
     @Override
     public String toString() {
-        return "K";
+        return "King";
     }
     
     @Override

@@ -1,6 +1,5 @@
 package KOTHChessGame.Model;
 
-import KOTHChessGame.Application.UI;
 import KOTHChessGame.ChessPieces.Bishop;
 import KOTHChessGame.ChessPieces.King;
 import KOTHChessGame.ChessPieces.Knight;
@@ -8,6 +7,7 @@ import KOTHChessGame.ChessPieces.Pawn;
 import KOTHChessGame.ChessPieces.Queen;
 import KOTHChessGame.ChessPieces.Rook;
 import KOTHChessGame.GUI.ChessBoardGUI;
+import KOTHChessGame.GUI.ChessGameGUI;
 import java.io.BufferedWriter;
 import java.io.FileNotFoundException;
 import java.io.FileWriter;
@@ -15,7 +15,6 @@ import java.io.IOException;
 import static java.lang.Math.abs;
 import java.util.ArrayList;
 import java.util.LinkedList;
-import java.util.Scanner;
 
 public class ChessGameController {
 
@@ -24,12 +23,14 @@ public class ChessGameController {
     private int turn;
     private LinkedList<Position> actionLog = new LinkedList<Position>();
     private ChessBoardGUI cbgui;
+    private ChessGameGUI cggui;
     private Position selectedSquare;
     private boolean gameEnded;
 
-    public ChessGameController(ChessBoardGUI cbgui) {
+    public ChessGameController(ChessGameGUI cggui) {
         cb = new ChessBoard();
-        this.cbgui = cbgui;
+        this.cbgui = cggui.getBoardGUI();
+        this.cggui = cggui;
         initializeBoard();
     }
 
@@ -59,7 +60,12 @@ public class ChessGameController {
         } else {
             currentTurn = PieceColor.WHITE;
             turn += 1;
+            cggui.addGameLogDisplay("Turn "+turn+"\n");
+            
         }
+        cggui.setTurnNumberDisplay("Turn number: " +String.valueOf(turn));
+        cggui.setPlayerTurnDisplay("Current turn: " +currentTurn.toString());
+        
     }
 
     public LinkedList<Position> getActionLog() {
@@ -157,7 +163,6 @@ public class ChessGameController {
             for (int i = 0; i < cb.getRanks(); i++) {
                 for (int j = 0; j < cb.getFiles(); j++) {
                     Position pos = new Position(i, j);
-                    System.out.println("creating position " +pos.toString());
                     if (cb.getPieceAt(pos) != null && cb.getPieceAt(pos).color == currentTurn) {
                         if (!simulateMoves(pos, cb.getPieceAt(pos).validMoves(pos)).isEmpty()) {
                             return false;
@@ -288,30 +293,19 @@ public class ChessGameController {
             }  
         return false;
     }
-    
-    
-    
-    // placeholder method
-    /*
-    public void promotionEvent(Position pos){
-        Scanner scan = new Scanner(System.in);
-        System.out.println("");
-        System.out.println("Select which piece to promote to:");
-        System.out.println("Bishop (b)");
-        System.out.println("Knight (n)");
-        System.out.println("Queen  (q)");
-        System.out.println("Rook   (r)");
-        while (isPromotable(pos)) {
-            try {
-                promotePiece(pos, scan);
-            } catch (ChessGameException e) {
-                System.out.println(e.getMessage());
-            }
+
+    public void endGame(){
+        gameEnded = true;
+        
+        if (getTurnColor() == PieceColor.WHITE) {
+            System.out.println("BLACK WINS!");
+            cggui.addGameLogDisplay("BLACK WINS!");
+        } else {
+            System.out.println("WHITE WINS!");
+            cggui.addGameLogDisplay("WHITE WINS!");
         }
-    } */
-    
-    public void forfeit(){
-        // TODO
+            saveActionLog(getActionLog());
+            cggui.setForfeitButtonText("Menu");
     }
     
     public void callPosition(int rank, int file){
@@ -360,44 +354,38 @@ public class ChessGameController {
                         // mark pawn for en passant
                         checkDoubleSquarePawnMove(cb.getPieceAt(pos), selectedSquare, pos);
                         
-                        
                         // check promotion
                         if (isPromotable(pos)) {
                             cbgui.showPromotionMenu(pos.getRank(), pos.getFile());
                             //promotionEvent(pos);
                         }
                         
-                        
-                        increaseTurn();
-                        System.out.println("Turn incremented");
-                        
-                        // clear all en passant on current player's pawns
-                        cb.clearEnPassant(currentTurn);
-
                         boolean[][] highlights = new boolean[cb.getRanks()][cb.getFiles()];
                         highlights[selectedSquare.getRank()][selectedSquare.getFile()] = true;
                         highlights[pos.getRank()][pos.getFile()] = true;
+                        
+                        // updates gui
                         cbgui.updateRecentMoveDisplay(highlights);
                         cbgui.updatePieceIcons(cb.getBoardIcons());
+                        cggui.addGameLogDisplay(currentTurn.toString()+ " moved " +selectedSquare.toString()+ " to " +pos.toString() +"\n");
                         
-                        System.out.println("GUI updated");
+                        increaseTurn();
+                        
+                        // clear all en passant on current player's pawns
+                        cb.clearEnPassant(currentTurn);
+                        
                         
                         if(isCheckmate()){
-                            gameEnded = true;
-                            if (getTurnColor() == PieceColor.WHITE) {
-                                System.out.println("BLACK WINS!");
-                            } else {
-                                System.out.println("WHITE WINS!");
-                            }
-                                saveActionLog(getActionLog());
+                            endGame();
                         }else if(isChecked(cb)) {
                             System.out.println("");
                             System.out.println("IN CHECK");
+                            
+                            cggui.addGameLogDisplay(currentTurn.toString()+ " is in check \n");
                         }else{
+                            
                             System.out.println("To move: ");
                         }
-
-
 
                     } catch (ChessGameException e) {
                         System.out.println(e.getMessage());
@@ -445,6 +433,9 @@ public class ChessGameController {
         currentTurn = PieceColor.WHITE;
         turn = 1;
         cbgui.updatePieceIcons(cb.getBoardIcons());
+        cggui.setTurnNumberDisplay("Turn number: " +String.valueOf(turn));
+        cggui.setPlayerTurnDisplay("Current turn: " +currentTurn.toString());
+        cggui.addGameLogDisplay("Turn "+turn+"\n");
     }
     
 }

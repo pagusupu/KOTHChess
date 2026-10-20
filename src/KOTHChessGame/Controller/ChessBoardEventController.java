@@ -57,4 +57,8 @@ public class ChessBoardEventController {
     public void signalPromotion(String piece, int rank, int file) {
         cgc.promotePiece(piece, new Position(rank, file));
     }
+    
+    public void signalForfeit(){
+        cgc.endGame();
+    }
 }

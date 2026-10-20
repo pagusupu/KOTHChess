@@ -134,64 +134,50 @@ public class ChessBoard {
                 && checkPosition(target) == SquareState.EMPTY){
             
                 // check en passant scneario for both sides
-            if(getPieceAt(new Position(source.getRank(), source.getFile()+1)) instanceof Pawn pawn2
+                Position p = new Position(source.getRank(), source.getFile()+1);
+            if(checkPosition(p) != SquareState.OUT_OF_BOUNDS && getPieceAt(p) instanceof Pawn pawn2
                     && pawn.getColor() != pawn2.getColor()
                     && source.getFile() - target.getFile() == -1
                     && pawn2.isEnPassant()){
                 
                 return new Position(source.getRank(), source.getFile()+1);
                 
-            }else if(getPieceAt(new Position(source.getRank(), source.getFile()-1)) instanceof Pawn pawn2
+            }else{ 
+                p = new Position(source.getRank(), source.getFile()-1);
+                if(checkPosition(p) != SquareState.OUT_OF_BOUNDS && getPieceAt(p) instanceof Pawn pawn2
                     && pawn.getColor() != pawn2.getColor()
                     && source.getFile() - target.getFile() == 1
                     && pawn2.isEnPassant()){ 
                 
                 return new Position(source.getRank(), source.getFile()-1);
                 
+                }   
             }
+                
         }
                 
         return null;
     }
     
-    private void rookCastleMove(Position source, Position target){
-        ArrayList<Position> vm = new ArrayList<Position>();
-        Position p;
-        
-        // kingside castling
-        if(target.getFile() - source.getFile() == 2){
-            p = new Position(source.getRank(), source.getFile()+3);
-            vm.add(p);
-            movePiece(new Position(source.getRank(), source.getFile()+1), p, vm);
-        }
-
-        // queenside castling
-        else if(source.getFile() - target.getFile() == 2){
-            p = new Position(source.getRank(), source.getFile()-4);
-            vm.add(p);
-            movePiece(new Position(source.getRank(), source.getFile()-1), p, vm);
-        }
-        
-    }
 
     public void movePiece(Position source, Position target, ArrayList<Position> validMoves) {
         // Move a piece, if target location has an opposing piece, capture it
-        if (getPieceAt(source) != null) {
+        if (checkPosition(source) == SquareState.OCCUPIED) {
             if (containsTarget(target, validMoves)) {
                 if (checkPosition(target) == SquareState.OCCUPIED) {
                     capturePiece(target);
-                }
-                else {
+                } // check for special moves
+                else if(checkPosition(target) == SquareState.EMPTY){
                     // if move is an en passant capture
                     Position enPawn = checkEnPassantCapture(source, target);
                     if(enPawn != null){
                             capturePiece(enPawn);
                     }
-                    // if move is a castle; moves the rook
+                
+                    // check if move is a castle; moves the rook
                     else if( getPieceAt(source) instanceof King ){
                         Position rookSource;
                         Position rookTarget;
-                        System.out.println("castling logic triggered");
                         
                         // kingside castling
                         if(target.getFile() - source.getFile() == 2){
@@ -211,12 +197,9 @@ public class ChessBoard {
                             placePiece(getPieceAt(rookSource), rookTarget);
                             getPieceAt(rookTarget).increaseTurnCount();
                             removePiece(rookSource);
-                            
                         }
-                        
-                            //rookCastleMove(source, target);
-                        }
-                }
+                    }
+                }   
                 
                 placePiece(getPieceAt(source), target);
                 getPieceAt(target).increaseTurnCount();
