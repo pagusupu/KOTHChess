@@ -160,7 +160,6 @@ public class ChessGameController {
                     System.out.println("creating position " +pos.toString());
                     if (cb.getPieceAt(pos) != null && cb.getPieceAt(pos).color == currentTurn) {
                         if (!simulateMoves(pos, cb.getPieceAt(pos).validMoves(pos)).isEmpty()) {
-                            System.out.println("checkmate verification complete");
                             return false;
                         }
                     }
@@ -230,20 +229,19 @@ public class ChessGameController {
         }
     }
 
-    public void promotePiece(Position target, Scanner scan) {
+    public void promotePiece(String input, Position target) {
         // Promote piece to given type
         if (isPromotable(target)) {
-            String input = scan.nextLine().trim();
             PieceColor color = cb.getPieceAt(target).color;
             ChessPiece piece = new Pawn(cb, color);
 
-            if (input.equalsIgnoreCase("q")) {
+            if (input.equalsIgnoreCase("Queen")) {
                 piece = new Queen(cb, color);
-            } else if (input.equalsIgnoreCase("b")) {
+            } else if (input.equalsIgnoreCase("Bishop")) {
                 piece = new Bishop(cb, color);
-            } else if (input.equalsIgnoreCase("n")) {
+            } else if (input.equalsIgnoreCase("Knight")) {
                 piece = new Knight(cb, color);
-            } else if (input.equalsIgnoreCase("r")) {
+            } else if (input.equalsIgnoreCase("Rook")) {
                 piece = new Rook(cb, color);
             } else {
                 throw new ChessGameException("promotePiece: Not a piece. Try again");
@@ -294,6 +292,7 @@ public class ChessGameController {
     
     
     // placeholder method
+    /*
     public void promotionEvent(Position pos){
         Scanner scan = new Scanner(System.in);
         System.out.println("");
@@ -309,7 +308,7 @@ public class ChessGameController {
                 System.out.println(e.getMessage());
             }
         }
-    }
+    } */
     
     public void forfeit(){
         // TODO
@@ -364,7 +363,8 @@ public class ChessGameController {
                         
                         // check promotion
                         if (isPromotable(pos)) {
-                            promotionEvent(pos);
+                            cbgui.showPromotionMenu(pos.getRank(), pos.getFile());
+                            //promotionEvent(pos);
                         }
                         
                         

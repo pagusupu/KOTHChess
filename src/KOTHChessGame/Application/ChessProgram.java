@@ -2,6 +2,7 @@ package KOTHChessGame.Application;
 
 import KOTHChessGame.Controller.ChessBoardEventController;
 import KOTHChessGame.GUI.ChessBoardGUI;
+import KOTHChessGame.GUI.ChessGameGUI;
 import KOTHChessGame.Model.ChessGameController;
 import KOTHChessGame.Model.ChessGameException;
 import KOTHChessGame.Model.PieceColor;
@@ -20,7 +21,9 @@ public class ChessProgram {
     public static void main(String[] args) {
         
         JFrame f = new JFrame("KOTH Chess");
-        ChessBoardGUI chessPanel = new ChessBoardGUI();        
+        
+        ChessBoardGUI chessPanel = new ChessBoardGUI();
+        ChessGameGUI gameWindow = new ChessGameGUI(chessPanel); 
         
         f.add(chessPanel);
         

@@ -2,14 +2,14 @@
 package KOTHChessGame.GUI; 
 import KOTHChessGame.Controller.ChessBoardEventController;
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Image;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
 public class ChessBoardGUI extends JPanel{
@@ -33,45 +33,26 @@ public class ChessBoardGUI extends JPanel{
         
         boardImage = new ImageIcon(BOARDPNG).getImage();
         
+        setPreferredSize(new Dimension(PANELWIDTH, PANELHEIGHT));
+        
         // initialize highlightedSquares array (stores which squares in the grid are highlighted)
         for(int i=0; i<RANKS; i++){
             for(int j=0; j<FILES; j++){
                 highlightedSquares[i][j] = new SquareColor();
             }
         }
-        
-
-        
-        // test
-        /*
-        ChessBoard cb = new ChessBoard();
-        Pawn pawn = new Pawn(cb, PieceColor.WHITE);
-        Queen qn = new Queen(cb, PieceColor.BLACK);
-        Knight kn = new Knight(cb, PieceColor.WHITE);
-        
-        placePieceDisplay(6, 7, qn.getIcon());
-        for(int i=0; i<8; i++){
-            placePieceDisplay(i, 0, pawn.getIcon());
-            highlightGreen(i, 4);
-            if(i != 4){
-                
-                highlightBlue(4, i);
-            }
-        }
-        for(int i=1; i<8; i++){
-            placePieceDisplay(0, i, qn.getIcon());
-            placePieceDisplay(i, i, kn.getIcon());
-        }
-        */
     }
     
-    public void setController(ChessBoardEventController controller){
+    
+    public ChessBoardEventController getController() {
+        return controller;
+    }
+
+    
+    public void setController(ChessBoardEventController controller) {
         this.controller = controller;
     }
     
-    public ChessBoardEventController getController(){
-        return controller;
-    }
     
     public void highlightBlue(int rank, int file){
         highlightedSquares[rank][file].setColored(true);
@@ -148,6 +129,17 @@ public class ChessBoardGUI extends JPanel{
         repaint();
     }
     
+    public void showPromotionMenu(int rank, int file){
+        String[] promotions = {"Bishop", "Knight", "Queen", "Rook"};
+        String promotedPiece = (String)JOptionPane.showInputDialog(null, "Choose promotion piece", "Maze Files", JOptionPane.PLAIN_MESSAGE, null, promotions, null );
+        if(promotedPiece != null){
+            getController().signalPromotion(promotedPiece, rank, file);
+        }else{
+            getController().signalPromotion("Queen", rank, file);
+        }
+        
+    }
+    
     @Override
     public void paintComponent(Graphics g){
         super.paintComponent(g);
@@ -176,7 +168,8 @@ public class ChessBoardGUI extends JPanel{
                 }
             }
         }
- 
         
     }
+
+    
 }

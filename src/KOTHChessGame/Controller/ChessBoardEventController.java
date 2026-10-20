@@ -13,9 +13,8 @@ public class ChessBoardEventController {
     
     public ChessBoardEventController(ChessBoardGUI cbgui, ChessGameController cgc){
         this.cbgui = cbgui;
-        cbgui.setController(this);
         this.cgc = cgc;
-        cgc.setView(cbgui);
+        
         cbgui.addMouseListener(new MouseListener() {
             @Override
             public void mouseClicked(MouseEvent e) {
@@ -46,10 +45,16 @@ public class ChessBoardEventController {
             public void mouseExited(MouseEvent e) {
             }
         });
+        
+        linkComponents();
+    }
+    
+    private void linkComponents(){
+        cgc.setView(cbgui);
+        cbgui.setController(this);
     }
 
-    public void clickedSquare(int rank, int file) {
-        // test
-        
+    public void signalPromotion(String piece, int rank, int file) {
+        cgc.promotePiece(piece, new Position(rank, file));
     }
 }
