@@ -3,6 +3,7 @@ package KOTHChessGame.Application;
 import KOTHChessGame.Controller.ChessBoardEventController;
 import KOTHChessGame.GUI.ChessBoardGUI;
 import KOTHChessGame.GUI.ChessGameGUI;
+import KOTHChessGame.GUI.ChessReplayGUI;
 import KOTHChessGame.Model.ChessGameController;
 import java.awt.Dimension;
 import javax.swing.JFrame;
@@ -37,8 +38,20 @@ public class MainMenu {
             ChessBoardEventController cbec = new ChessBoardEventController(chessPanel, cgr);
             
         }else if(input.equalsIgnoreCase("view replays")){
-            // temp
-            System.exit(0);
+
+            ChessBoardGUI chessPanel = new ChessBoardGUI();
+            ChessReplayGUI gameWindow = new ChessReplayGUI(chessPanel);
+            gameWindow.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+
+            gameWindow.setLocation(0,0);
+            gameWindow.setPreferredSize(new Dimension(ChessReplayGUI.PANELWIDTH, ChessReplayGUI.PANELHEIGHT));
+            gameWindow.setResizable(false);
+            gameWindow.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+            gameWindow.pack();
+            gameWindow.setVisible(true);
+
+            // insert replay controller here
+            
         }
         
     }

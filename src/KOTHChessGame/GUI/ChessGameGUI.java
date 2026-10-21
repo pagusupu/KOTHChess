@@ -33,23 +33,56 @@ public class ChessGameGUI extends JFrame {
         elementSetup();
         
         JPanel chessMenu = new JPanel();
-        chessMenu.add(turnNumber);
-        chessMenu.add(playerTurn);
-        chessMenu.add(forfeitButton);
-        chessMenu.add(scrollLog);
+        chessMenu.setLayout(new GridBagLayout());
+        GridBagConstraints buttonConstraints = new GridBagConstraints();
+        
+        buttonConstraints.fill = GridBagConstraints.NONE;
+        buttonConstraints.gridx = 0;
+        buttonConstraints.gridy = 0;
+        buttonConstraints.anchor = GridBagConstraints.LINE_START;
+        chessMenu.add(turnNumber, buttonConstraints);
+        
+        buttonConstraints.gridx = 0;
+        buttonConstraints.gridy = 1;
+        buttonConstraints.insets = new Insets(0, 0, 10, 100);
+        chessMenu.add(playerTurn, buttonConstraints);
+        
+        buttonConstraints.gridx = 4;
+        buttonConstraints.gridy = 0;
+        buttonConstraints.gridheight = 2;
+        buttonConstraints.insets = new Insets(0, 0, 0, 0);
+        buttonConstraints.anchor = GridBagConstraints.LINE_END;
+        chessMenu.add(forfeitButton, buttonConstraints);
+        
+        buttonConstraints.gridx = 0;
+        buttonConstraints.gridy = 3;
+        buttonConstraints.gridheight = 1;
+        buttonConstraints.gridwidth = 1;
+        buttonConstraints.anchor = GridBagConstraints.CENTER;
+        
+        buttonConstraints.gridx = 0;
+        buttonConstraints.gridy = 5;
+        buttonConstraints.gridwidth = 5;
+        chessMenu.add(scrollLog, buttonConstraints);
+        
         
         add(this.cbgui);
         
         setLayout(new GridBagLayout());
         
         GridBagConstraints boardConstraints = new GridBagConstraints();
-        boardConstraints.fill = GridBagConstraints.BOTH;
+        boardConstraints.fill = GridBagConstraints.NONE;
         boardConstraints.gridx = 0;
         boardConstraints.gridy = 0;
-        boardConstraints.ipady = 910;
-        boardConstraints.ipadx = 1000;
+        boardConstraints.ipady = 919;
+        boardConstraints.ipadx = 919;
         boardConstraints.gridwidth = 2;
-        boardConstraints.insets = new Insets(0, 90, 0, 0);
+        boardConstraints.anchor = GridBagConstraints.CENTER;
+        boardConstraints.insets = new Insets(0, 0, 0, 0);
+        Dimension boardDimension = new Dimension(ChessBoardGUI.WIDTH, ChessBoardGUI.HEIGHT);
+        cbgui.setMinimumSize(boardDimension);
+        cbgui.setMaximumSize(boardDimension);
+        cbgui.setPreferredSize(boardDimension);
         
         GridBagConstraints menuConstraints = new GridBagConstraints();
         menuConstraints.fill = GridBagConstraints.BOTH;
@@ -57,7 +90,13 @@ public class ChessGameGUI extends JFrame {
         menuConstraints.gridy = 0;
         menuConstraints.ipady = 30;
         menuConstraints.ipadx = 30;
-        menuConstraints.insets = new Insets(0, 0, 0, 200);
+        boardConstraints.anchor = GridBagConstraints.CENTER;
+        boardConstraints.fill = GridBagConstraints.NONE;
+        menuConstraints.insets = new Insets(0, 0, 0, 0);
+        Dimension menuDimension = new Dimension(400, 920);
+        chessMenu.setMinimumSize(menuDimension);
+        chessMenu.setMaximumSize(menuDimension);
+        chessMenu.setPreferredSize(menuDimension);
         
         this.add(cbgui, boardConstraints);
         this.add(chessMenu, menuConstraints);
@@ -77,8 +116,9 @@ public class ChessGameGUI extends JFrame {
             if(forfeitButton.getText().equals("Forfeit")){
                 cbgui.getController().signalForfeit();
             }else{
-                new MainMenu();
                 dispose();
+                new MainMenu();
+                
             }
         });
     }
@@ -92,7 +132,7 @@ public class ChessGameGUI extends JFrame {
     }
     
     public void setForfeitButtonText(String text){
-        forfeitButton.setText("Menu");
+        forfeitButton.setText(text);
     }
     
     public void setGameLogDisplay(String text){

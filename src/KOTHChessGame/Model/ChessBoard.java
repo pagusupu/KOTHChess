@@ -2,7 +2,6 @@ package KOTHChessGame.Model;
 
 import KOTHChessGame.ChessPieces.King;
 import KOTHChessGame.ChessPieces.Pawn;
-import static java.lang.Math.abs;
 import java.util.ArrayList;
 
 public class ChessBoard {

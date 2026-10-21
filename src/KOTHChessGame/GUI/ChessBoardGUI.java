@@ -2,7 +2,6 @@
 package KOTHChessGame.GUI; 
 import KOTHChessGame.Controller.ChessBoardEventController;
 import java.awt.Color;
-import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Image;
 import java.awt.image.BufferedImage;
@@ -14,8 +13,8 @@ import javax.swing.JPanel;
 
 public class ChessBoardGUI extends JPanel{
     
-    public static final int PANELWIDTH = 960;
-    public static final int PANELHEIGHT = 960;
+    public static final int PANELWIDTH = 920;
+    public static final int PANELHEIGHT = 920;
     public static final int RANKS = 8;
     public static final int FILES = 8;
     private static final Color TRANSLUCENTBLUE = new Color(63, 243, 235, 100);
@@ -33,7 +32,7 @@ public class ChessBoardGUI extends JPanel{
         
         boardImage = new ImageIcon(BOARDPNG).getImage();
         
-        setPreferredSize(new Dimension(PANELWIDTH, PANELHEIGHT));
+        //setPreferredSize(new Dimension(PANELWIDTH, PANELHEIGHT));
         
         // initialize highlightedSquares array (stores which squares in the grid are highlighted)
         for(int i=0; i<RANKS; i++){
@@ -130,12 +129,17 @@ public class ChessBoardGUI extends JPanel{
     }
     
     public void showPromotionMenu(int rank, int file){
+        
         String[] promotions = {"Queen", "Bishop", "Knight", "Rook"};
         String promotedPiece = (String)JOptionPane.showInputDialog(null, "Choose promotion piece", "Promotion ", JOptionPane.PLAIN_MESSAGE, null, promotions, null );
-        if(promotedPiece != null){
-            getController().signalPromotion(promotedPiece, rank, file);
-        }else{
-            getController().signalPromotion("Queen", rank, file);
+        try{
+            if(promotedPiece != null){
+                getController().signalPromotion(promotedPiece, rank, file);
+            }else{
+                getController().signalPromotion("Queen", rank, file);
+            }
+        }catch(ChessGUIException e){
+            System.out.println("No controller attached: " +e.getMessage());
         }
     }
     
