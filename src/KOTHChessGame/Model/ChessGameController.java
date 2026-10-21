@@ -87,18 +87,27 @@ public class ChessGameController {
     public ArrayList<Position> selectPiece(Position pos) {
         // processes a given position if it is a valid piece to move. 
         // if true, returns an ArrayList of possible moves
-        if (cb.getPieceAt(pos) == null) {
-            throw new ChessGameException("selectPiece: Position is empty. Try again");
-        }
+        ArrayList<Position> pieceMoves = new ArrayList<Position>();
+        
+        try{
+            if (cb.getPieceAt(pos) == null) {
+                cggui.setStatusDisplay("Selected position is empty.");
+                throw new ChessGameException("selectPiece: Position is empty. Try again");
+            }
 
-        if (cb.getPieceAt(pos).getColor() != currentTurn) {
-            throw new ChessGameException("selectPiece: Position contains opponent piece. Try again");
-        }
+            if (cb.getPieceAt(pos).getColor() != currentTurn) {
+                cggui.setStatusDisplay("Selected position contains opponent piece.");
+                throw new ChessGameException("selectPiece: Position contains opponent piece. Try again");
+            }
 
-        ArrayList<Position> pieceMoves = cb.getPieceAt(pos).validMoves(pos);
+            pieceMoves = cb.getPieceAt(pos).validMoves(pos);
 
-        if (pieceMoves.isEmpty()) {
-            throw new ChessGameException("selectPiece: Selected piece has no valid moves. Try again");
+            if (pieceMoves.isEmpty()) {
+                cggui.setStatusDisplay("Selected piece has no valid moves.");
+                throw new ChessGameException("selectPiece: Selected piece has no valid moves. Try again");
+            }
+        }catch(ChessGUIException e){
+            System.out.println("No GUI field attached: " +e.getMessage());
         }
 
         return pieceMoves;
@@ -124,7 +133,7 @@ public class ChessGameController {
             for (int j = 0; j < cb.getRanks(); j++) {
                 for (int k = 0; k < cb.getFiles(); k++) {
                     Position pos = new Position(j, k);
-                    if (cb.getPieceAt(pos) != null) {
+                    if (cb.checkPosition(pos) == SquareState.OCCUPIED) {
                         sb.placePiece(cb.getPieceAt(pos).copy(sb), pos);
                     }
                 }
@@ -292,6 +301,7 @@ public class ChessGameController {
             }
                 saveActionLog(getActionLog());
                 cggui.setForfeitButtonText("Menu");
+                cggui.setStatusDisplay("Game has ended.");
         }catch(ChessGUIException e){
             System.out.println("No GUI field attached: " +e.getMessage());
         }
@@ -311,18 +321,22 @@ public class ChessGameController {
                     validMoves = simulateMoves(pos, selectPiece(pos));
                 } catch (ChessGameException e) {
                     System.out.println(e.getMessage());
+                    cggui.setStatusDisplay("Select a valid piece to move.");
                     System.out.println("To move: ");
                 }
                 // if selected piece has valid move(s)
                 if(!validMoves.isEmpty()){
                     // move into "piece is selected" phase
                     selectedSquare = pos;
+                    cggui.setStatusDisplay("Select target (click the same square to deselect).");
                     System.out.println("Target: ");
                     boolean[][] highlights = new boolean[cb.getRanks()][cb.getFiles()];
                     for(Position p : validMoves){
                         highlights[p.getRank()][p.getFile()] = true;
                     }
                     cbgui.updateValidMoveDisplay(highlights);
+                }else{
+                    cggui.setStatusDisplay("Selected square is invalid or has no moves.");
                 }
 
                 // "piece is selected" phase
@@ -334,6 +348,7 @@ public class ChessGameController {
                     selectedSquare = null;
                     cbgui.clearAllHighlights();
                     System.out.println("Piece deselected");
+                    cggui.setStatusDisplay("Select a valid piece to move.");
                     System.out.println("To move: ");
 
                 }else if(cb.containsTarget(pos, validMoves)) {
@@ -357,6 +372,7 @@ public class ChessGameController {
                         cbgui.updateRecentMoveDisplay(highlights);
                         cbgui.updatePieceIcons(cb.getBoardIcons());
                         cggui.addGameLogDisplay(currentTurn.toString()+ " moved " +selectedSquare.toString()+ " to " +pos.toString() +"\n");
+                        cggui.setStatusDisplay("Select a valid piece to move.");
                         
                         increaseTurn();
                         
@@ -421,14 +437,21 @@ public class ChessGameController {
         // set first turn to White
         currentTurn = PieceColor.WHITE;
         turn = 1;
+        
+        
+    }
+    
+    public void initializeGameGUI(){
         try{
             cbgui.updatePieceIcons(cb.getBoardIcons());
             cggui.setTurnNumberDisplay("Turn number: " +String.valueOf(turn));
             cggui.setPlayerTurnDisplay("Current turn: " +currentTurn.toString());
             cggui.addGameLogDisplay("Turn "+turn+"\n");
+            cggui.setStatusDisplay("Select a valid piece to move.");
         }catch(ChessGUIException e){
             System.out.println("No GUI field attached: " +e.getMessage());
         }
+            
     }
     
 }

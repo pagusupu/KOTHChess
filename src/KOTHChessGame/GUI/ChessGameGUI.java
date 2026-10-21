@@ -20,6 +20,7 @@ public class ChessGameGUI extends JFrame {
     
     private JLabel turnNumber;
     private JLabel playerTurn;
+    private JLabel status;
     
     private JButton forfeitButton;
     private TextArea gameLog;
@@ -47,24 +48,23 @@ public class ChessGameGUI extends JFrame {
         buttonConstraints.insets = new Insets(0, 0, 10, 100);
         chessMenu.add(playerTurn, buttonConstraints);
         
-        buttonConstraints.gridx = 4;
+        buttonConstraints.gridx = 1;
         buttonConstraints.gridy = 0;
         buttonConstraints.gridheight = 2;
-        buttonConstraints.insets = new Insets(0, 0, 0, 0);
+        buttonConstraints.insets = new Insets(0, 0, 10, 0);
         buttonConstraints.anchor = GridBagConstraints.LINE_END;
         chessMenu.add(forfeitButton, buttonConstraints);
         
         buttonConstraints.gridx = 0;
-        buttonConstraints.gridy = 3;
-        buttonConstraints.gridheight = 1;
-        buttonConstraints.gridwidth = 1;
-        buttonConstraints.anchor = GridBagConstraints.CENTER;
-        
-        buttonConstraints.gridx = 0;
         buttonConstraints.gridy = 5;
-        buttonConstraints.gridwidth = 5;
+        buttonConstraints.gridwidth = 2;
+        buttonConstraints.anchor = GridBagConstraints.CENTER;
         chessMenu.add(scrollLog, buttonConstraints);
         
+        buttonConstraints.gridx = 0;
+        buttonConstraints.gridy = 7;
+        buttonConstraints.gridwidth = 2;
+        chessMenu.add(status, buttonConstraints);
         
         add(this.cbgui);
         
@@ -106,6 +106,7 @@ public class ChessGameGUI extends JFrame {
         
         turnNumber = new JLabel("Turn number: ");
         playerTurn = new JLabel("Current turn: ");
+        status = new JLabel("");
         forfeitButton = new JButton("Forfeit");
         gameLog = new TextArea(50, 40);
         gameLog.setEditable(false);
@@ -151,6 +152,8 @@ public class ChessGameGUI extends JFrame {
         playerTurn.setText(text);
     }
     
-    
+    public void setStatusDisplay(String text){
+        status.setText(text);
+    }
     
 }

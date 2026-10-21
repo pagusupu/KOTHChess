@@ -50,7 +50,7 @@ public class ChessReplayGUI extends JFrame {
         buttonConstraints.gridx = 4;
         buttonConstraints.gridy = 0;
         buttonConstraints.gridheight = 2;
-        buttonConstraints.insets = new Insets(0, 0, 0, 0);
+        buttonConstraints.insets = new Insets(0, 0, 10, 0);
         buttonConstraints.anchor = GridBagConstraints.LINE_END;
         chessMenu.add(exitButton, buttonConstraints);
         
