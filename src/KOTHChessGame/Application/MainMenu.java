@@ -31,7 +31,9 @@ public class MainMenu {
             gameWindow.pack();
             gameWindow.setVisible(true);
 
-            ChessGameController cgr = new ChessGameController(gameWindow);
+            ChessGameController cgr = new ChessGameController(chessPanel);
+            cgr.attachGameWindow(gameWindow);
+            cgr.initializeBoard();
             ChessBoardEventController cbec = new ChessBoardEventController(chessPanel, cgr);
             
         }else if(input.equalsIgnoreCase("view replays")){

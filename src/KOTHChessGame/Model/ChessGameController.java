@@ -7,6 +7,7 @@ import KOTHChessGame.ChessPieces.Pawn;
 import KOTHChessGame.ChessPieces.Queen;
 import KOTHChessGame.ChessPieces.Rook;
 import KOTHChessGame.GUI.ChessBoardGUI;
+import KOTHChessGame.GUI.ChessGUIException;
 import KOTHChessGame.GUI.ChessGameGUI;
 import java.io.BufferedWriter;
 import java.io.FileNotFoundException;
@@ -27,11 +28,9 @@ public class ChessGameController {
     private Position selectedSquare;
     private boolean gameEnded;
 
-    public ChessGameController(ChessGameGUI cggui) {
+    public ChessGameController(ChessBoardGUI cbgui) {
         cb = new ChessBoard();
-        this.cbgui = cggui.getBoardGUI();
-        this.cggui = cggui;
-        initializeBoard();
+        this.cbgui = cbgui;
     }
 
     public ChessBoard getBoard() {
@@ -40,6 +39,14 @@ public class ChessGameController {
 
     public int getTurn() {
         return turn;
+    }
+    
+    public void attachGameWindow(ChessGameGUI cggui){
+        this.cggui = cggui;
+    }
+    
+    public ChessGameGUI getGameWindow(){
+        return cggui;
     }
 
     public PieceColor getTurnColor() {
@@ -55,16 +62,21 @@ public class ChessGameController {
     }
 
     public void increaseTurn() {
-        if (currentTurn == PieceColor.WHITE) {
-            currentTurn = PieceColor.BLACK;
-        } else {
-            currentTurn = PieceColor.WHITE;
-            turn += 1;
-            cggui.addGameLogDisplay("Turn "+turn+"\n");
-            
+        try{
+            if (currentTurn == PieceColor.WHITE) {
+                currentTurn = PieceColor.BLACK;
+            } else {
+                currentTurn = PieceColor.WHITE;
+                turn += 1;
+                cggui.addGameLogDisplay("Turn "+turn+"\n");
+
+            }
+            cggui.setTurnNumberDisplay("Turn number: " +String.valueOf(turn));
+            cggui.setPlayerTurnDisplay("Current turn: " +currentTurn.toString());
+        }catch(ChessGUIException e){
+            System.out.println("No GUI field attached: " +e.getMessage());
         }
-        cggui.setTurnNumberDisplay("Turn number: " +String.valueOf(turn));
-        cggui.setPlayerTurnDisplay("Current turn: " +currentTurn.toString());
+        
         
     }
 
@@ -122,33 +134,6 @@ public class ChessGameController {
                 testedMoves.add(validMoves.get(i));
             }
         }
-        
-        // special castling check: squares at and between king's movement must not be occupiable
-        /*
-        if(cb.getPieceAt(source) instanceof King k){
-            
-            for(Position p : testedMoves){
-                // kingside castle check
-                if(p.getFile() - source.getFile() == 2){
-                    for(int i = 0; i <= 2 ; i++){
-                        if(cb.canBeOccupied(k.getColor(), new Position(source.getRank(), source.getFile()+i))){
-                            testedMoves.remove(p);
-                        }
-                    }
-                }
-                
-                // queenside castle check
-                if(source.getFile() - p.getFile() == 2){
-                    for(int i = 0; i <= 2 ; i++){
-                        if(cb.canBeOccupied(k.getColor(), new Position(source.getRank(), source.getFile()-i))){
-                            testedMoves.remove(p);
-                        }
-                    }
-                }
-            }
-        }
-        */
-        
         
         return testedMoves;
     }
@@ -297,15 +282,19 @@ public class ChessGameController {
     public void endGame(){
         gameEnded = true;
         
-        if (getTurnColor() == PieceColor.WHITE) {
-            System.out.println("BLACK WINS!");
-            cggui.addGameLogDisplay("BLACK WINS!");
-        } else {
-            System.out.println("WHITE WINS!");
-            cggui.addGameLogDisplay("WHITE WINS!");
+        try{
+            if (getTurnColor() == PieceColor.WHITE) {
+                System.out.println("BLACK WINS!");
+                cggui.addGameLogDisplay("BLACK WINS!");
+            } else {
+                System.out.println("WHITE WINS!");
+                cggui.addGameLogDisplay("WHITE WINS!");
+            }
+                saveActionLog(getActionLog());
+                cggui.setForfeitButtonText("Menu");
+        }catch(ChessGUIException e){
+            System.out.println("No GUI field attached: " +e.getMessage());
         }
-            saveActionLog(getActionLog());
-            cggui.setForfeitButtonText("Menu");
     }
     
     public void callPosition(int rank, int file){
@@ -396,13 +385,13 @@ public class ChessGameController {
                     validMoves = null;
                 }
             }
-        } catch (ChessGameException e){
+        } catch (ChessGameException | ChessGUIException e){
             System.out.println(e.getMessage());
         }
        
     }
 
-    private void initializeBoard() {
+    public void initializeBoard() {
         // place pawns
         for (int i = 0; i < cb.getFiles(); i++) {
             cb.placePiece(new Pawn(cb, PieceColor.WHITE), new Position(1, i));
@@ -432,10 +421,14 @@ public class ChessGameController {
         // set first turn to White
         currentTurn = PieceColor.WHITE;
         turn = 1;
-        cbgui.updatePieceIcons(cb.getBoardIcons());
-        cggui.setTurnNumberDisplay("Turn number: " +String.valueOf(turn));
-        cggui.setPlayerTurnDisplay("Current turn: " +currentTurn.toString());
-        cggui.addGameLogDisplay("Turn "+turn+"\n");
+        try{
+            cbgui.updatePieceIcons(cb.getBoardIcons());
+            cggui.setTurnNumberDisplay("Turn number: " +String.valueOf(turn));
+            cggui.setPlayerTurnDisplay("Current turn: " +currentTurn.toString());
+            cggui.addGameLogDisplay("Turn "+turn+"\n");
+        }catch(ChessGUIException e){
+            System.out.println("No GUI field attached: " +e.getMessage());
+        }
     }
     
 }
