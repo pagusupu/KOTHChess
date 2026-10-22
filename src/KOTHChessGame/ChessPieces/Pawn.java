@@ -8,13 +8,13 @@ import KOTHChessGame.Model.SquareState;
 import java.util.ArrayList;
 
 public class Pawn extends ChessPiece {
-    
+
     private boolean enPassant;
 
     public Pawn(ChessBoard board, PieceColor color) {
         super(board, color);
         enPassant = false;
-        
+
         whiteIcon = "./resources/BoardAssets/WPawn.png";
         blackIcon = "./resources/BoardAssets/BPawn.png";
     }

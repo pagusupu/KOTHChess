@@ -8,7 +8,7 @@ import KOTHChessGame.Model.SquareState;
 import java.util.ArrayList;
 
 public class Rook extends ChessPiece {
-    
+
     protected static final String BLACK_ICON = "./resources/BoardAssets/BRook.png";
     protected static final String WHITE_ICON = "./resources/BoardAssets/WRook.png";
 
@@ -74,7 +74,7 @@ public class Rook extends ChessPiece {
     public String toString() {
         return "Rook";
     }
-    
+
     @Override
     public Rook copy(ChessBoard cb) {
         Rook newPiece = new Rook(cb, this.color);

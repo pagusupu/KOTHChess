@@ -71,7 +71,7 @@ public class Bishop extends ChessPiece {
     public String toString() {
         return "Bishop";
     }
-    
+
     @Override
     public Bishop copy(ChessBoard cb) {
         Bishop newPiece = new Bishop(cb, this.color);

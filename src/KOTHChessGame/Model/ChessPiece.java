@@ -2,7 +2,7 @@ package KOTHChessGame.Model;
 
 import java.util.ArrayList;
 
-public abstract class ChessPiece{
+public abstract class ChessPiece {
 
     protected ChessBoard board;
     protected PieceColor color;
@@ -17,11 +17,11 @@ public abstract class ChessPiece{
         whiteIcon = null;
         blackIcon = null;
     }
-    
-    public String getIcon(){
-        if(color == PieceColor.BLACK){
+
+    public String getIcon() {
+        if (color == PieceColor.BLACK) {
             return blackIcon;
-        }else{
+        } else {
             return whiteIcon;
         }
     }
@@ -37,7 +37,7 @@ public abstract class ChessPiece{
     public ChessBoard getBoard() {
         return board;
     }
-    
+
     public PieceColor getColor() {
         return color;
     }
@@ -45,6 +45,6 @@ public abstract class ChessPiece{
     public abstract ChessPiece copy(ChessBoard cb);
 
     public abstract ArrayList<Position> validMoves(Position pos);
-    
+
     public abstract String toString();
 }

@@ -1,6 +1,6 @@
 package KOTHChessGame.Model;
 
-public enum SquareState{
+public enum SquareState {
     EMPTY,
     OCCUPIED,
     OUT_OF_BOUNDS;

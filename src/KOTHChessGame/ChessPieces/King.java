@@ -8,7 +8,7 @@ import KOTHChessGame.Model.SquareState;
 import java.util.ArrayList;
 
 public class King extends ChessPiece {
-    
+
     public King(ChessBoard board, PieceColor color) {
         super(board, color);
         whiteIcon = "./resources/BoardAssets/WKing.png";
@@ -75,7 +75,7 @@ public class King extends ChessPiece {
     public String toString() {
         return "King";
     }
-    
+
     @Override
     public King copy(ChessBoard cb) {
         King newPiece = new King(cb, this.color);

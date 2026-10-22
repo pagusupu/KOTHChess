@@ -8,7 +8,7 @@ import KOTHChessGame.Model.SquareState;
 import java.util.ArrayList;
 
 public class Queen extends ChessPiece {
-    
+
     protected static final String BLACK_ICON = "./resources/BoardAssets/BQueen.png";
     protected static final String WHITE_ICON = "./resources/BoardAssets/WQueen.png";
 

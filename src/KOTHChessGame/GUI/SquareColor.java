@@ -3,15 +3,16 @@ package KOTHChessGame.GUI;
 import java.awt.Color;
 
 public class SquareColor {
+
     private boolean colored;
     private Color highlightColor;
-    
-    public SquareColor(boolean colored, Color highlightColor){
+
+    public SquareColor(boolean colored, Color highlightColor) {
         this.colored = colored;
         this.highlightColor = highlightColor;
     }
-    
-    public SquareColor(){
+
+    public SquareColor() {
         this.colored = false;
     }
 
@@ -42,7 +43,5 @@ public class SquareColor {
     public void setHighlightColor(Color highlightColor) {
         this.highlightColor = highlightColor;
     }
-    
-    
-    
+
 }

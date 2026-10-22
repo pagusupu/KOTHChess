@@ -9,28 +9,31 @@ import KOTHChessGame.ChessPieces.Rook;
 import KOTHChessGame.GUI.ChessBoardGUI;
 import KOTHChessGame.GUI.ChessGUIException;
 import KOTHChessGame.GUI.ChessGameGUI;
-import java.io.BufferedWriter;
-import java.io.FileNotFoundException;
-import java.io.FileWriter;
-import java.io.IOException;
 import static java.lang.Math.abs;
 import java.util.ArrayList;
-import java.util.LinkedList;
+import java.sql.Connection;
+import java.sql.SQLException;
+import java.sql.Statement;
 
 public class ChessGameController {
 
     private ChessBoard cb;
     private PieceColor currentTurn;
     private int turn;
-    private LinkedList<Position> actionLog = new LinkedList<Position>();
+    private int moveTotal;
     private ChessBoardGUI cbgui;
     private ChessGameGUI cggui;
     private Position selectedSquare;
     private boolean gameEnded;
+    private final DB db;
+    private final Connection con;
+    private Statement stmnt;
 
     public ChessGameController(ChessBoardGUI cbgui) {
         cb = new ChessBoard();
         this.cbgui = cbgui;
+        db = new DB();
+        con = db.getConnection();
     }
 
     public ChessBoard getBoard() {
@@ -40,56 +43,58 @@ public class ChessGameController {
     public int getTurn() {
         return turn;
     }
-    
-    public void attachGameWindow(ChessGameGUI cggui){
+
+    public void setTurn(int turn) {
+        this.turn = turn;
+    }
+
+    public void attachGameWindow(ChessGameGUI cggui) {
         this.cggui = cggui;
     }
-    
-    public ChessGameGUI getGameWindow(){
+
+    public ChessGameGUI getGameWindow() {
         return cggui;
     }
 
     public PieceColor getTurnColor() {
         return currentTurn;
     }
-    
-    public void setView(ChessBoardGUI cbgui){
+
+    public void setTurnColor(PieceColor currentTurn) {
+        this.currentTurn = currentTurn;
+    }
+
+    public void setView(ChessBoardGUI cbgui) {
         this.cbgui = cbgui;
     }
-    
-    public ChessBoardGUI getView(){
+
+    public ChessBoardGUI getView() {
         return cbgui;
     }
 
     public void increaseTurn() {
-        try{
+        try {
             if (currentTurn == PieceColor.WHITE) {
                 currentTurn = PieceColor.BLACK;
             } else {
                 currentTurn = PieceColor.WHITE;
                 turn += 1;
-                cggui.addGameLogDisplay("Turn "+turn+"\n");
-
+                cggui.addGameLogDisplay("Turn " + turn + "\n");
             }
-            cggui.setTurnNumberDisplay("Turn number: " +String.valueOf(turn));
-            cggui.setPlayerTurnDisplay("Current turn: " +currentTurn.toString());
-        }catch(ChessGUIException e){
-            System.out.println("No GUI field attached: " +e.getMessage());
+            cggui.setTurnNumberDisplay("Turn number: " + String.valueOf(turn));
+            cggui.setPlayerTurnDisplay("Current turn: " + currentTurn.toString());
+        } catch (ChessGUIException e) {
+            System.out.println("No GUI field attached: " + e.getMessage());
         }
-        
-        
-    }
 
-    public LinkedList<Position> getActionLog() {
-        return actionLog;
     }
 
     public ArrayList<Position> selectPiece(Position pos) {
         // processes a given position if it is a valid piece to move. 
         // if true, returns an ArrayList of possible moves
-        ArrayList<Position> pieceMoves = new ArrayList<Position>();
-        
-        try{
+        ArrayList<Position> pieceMoves = new ArrayList<>();
+
+        try {
             if (cb.getPieceAt(pos) == null) {
                 cggui.setStatusDisplay("Selected position is empty.");
                 throw new ChessGameException("selectPiece: Position is empty. Try again");
@@ -106,26 +111,52 @@ public class ChessGameController {
                 cggui.setStatusDisplay("Selected piece has no valid moves.");
                 throw new ChessGameException("selectPiece: Selected piece has no valid moves. Try again");
             }
-        }catch(ChessGUIException e){
-            System.out.println("No GUI field attached: " +e.getMessage());
+        } catch (ChessGUIException e) {
+            System.out.println("No GUI field attached: " + e.getMessage());
         }
 
         return pieceMoves;
+    }
+
+    public void saveMove(int move, Position source, Position target) {
+        // save a move to db
+        try {
+            stmnt = con.createStatement();
+            stmnt.executeUpdate("INSERT INTO MOVEHISTORY VALUES ("
+                    + move + ", '"
+                    + source.toString() + "', '"
+                    + target.toString() + "', "
+                    + "'null')");
+        } catch (SQLException e) {
+            System.out.println("DB: Error: " + e.getMessage());
+        }
+    }
+
+    public void savePromotion(String promotion) {
+        // update a db entry to include what a piece at the given position was promoted to
+        try {
+            stmnt = con.createStatement();
+            stmnt.executeUpdate("UPDATE MOVEHISTORY SET PROMOTION = '"
+                    + promotion + "' WHERE MOVE = "
+                    + (moveTotal - 1));
+        } catch (SQLException e) {
+            System.out.println("DB: Error: " + e.getMessage());
+        }
     }
 
     public void confirmMove(Position source, Position target, ArrayList<Position> validMoves) {
         // Moves a piece after testing the move is legal
         // Records move in actionLog
         cb.movePiece(source, target, validMoves);
-        actionLog.addLast(source);
-        actionLog.addLast(target);
+        saveMove(moveTotal, source, target);
+        moveTotal += 1;
     }
 
     public ArrayList<Position> simulateMoves(Position source, ArrayList<Position> validMoves) {
         // Test each of a pieces valid moves to check
         // if a move will cause an illegal state i.e. check
         // Return an ArrayList of only legal moves
-        ArrayList<Position> testedMoves = new ArrayList<Position>();
+        ArrayList<Position> testedMoves = new ArrayList<>();
         ChessBoard sb = new ChessBoard();
 
         for (int i = 0; i < validMoves.size(); i++) {
@@ -143,7 +174,7 @@ public class ChessGameController {
                 testedMoves.add(validMoves.get(i));
             }
         }
-        
+
         return testedMoves;
     }
 
@@ -201,33 +232,6 @@ public class ChessGameController {
         return false;
     }
 
-    public void saveActionLog(LinkedList<Position> actionLog) {
-        // Write all positions saved in actionLog to actionlog.txt
-        BufferedWriter bw = null;
-
-        try {
-            bw = new BufferedWriter(new FileWriter("./resources/actionlog.txt"));
-            while (!actionLog.isEmpty()) {
-                bw.write(actionLog.remove().toString());
-                bw.write(" ");
-                bw.write(actionLog.remove().toString());
-                bw.newLine();
-            }
-        } catch (FileNotFoundException e) {
-            System.out.println(e);
-        } catch (IOException e) {
-            System.out.println(e);
-        } finally {
-            if (bw != null) {
-                try {
-                    bw.close();
-                } catch (IOException e) {
-                    System.out.println(e);
-                }
-            }
-        }
-    }
-
     public void promotePiece(String input, Position target) {
         // Promote piece to given type
         if (isPromotable(target)) {
@@ -270,126 +274,114 @@ public class ChessGameController {
         return false;
     }
 
-    
-    public boolean checkGameEnd(){
-        if(gameEnded){
+    public boolean checkGameEnd() {
+        if (gameEnded) {
             throw new ChessGameException("checkGameEnd: Game has ended.");
-        }else{
+        } else {
             return false;
         }
     }
-    
-    private boolean checkDoubleSquarePawnMove(ChessPiece p, Position source, Position dest){
-        if(p instanceof Pawn pwn && (abs(source.getRank() - dest.getRank()) == 2))  {  
-        
-                pwn.setEnPassant(true);
-                return true;
-            }  
+
+    private boolean checkDoubleSquarePawnMove(ChessPiece p, Position source, Position dest) {
+        if (p instanceof Pawn pwn && (abs(source.getRank() - dest.getRank()) == 2)) {
+            pwn.setEnPassant(true);
+            return true;
+        }
         return false;
     }
 
-    public void endGame(){
+    public void endGame() {
         gameEnded = true;
-        
-        try{
+
+        try {
             if (getTurnColor() == PieceColor.WHITE) {
-                System.out.println("BLACK WINS!");
                 cggui.addGameLogDisplay("BLACK WINS!");
             } else {
-                System.out.println("WHITE WINS!");
                 cggui.addGameLogDisplay("WHITE WINS!");
             }
-                saveActionLog(getActionLog());
-                cggui.setForfeitButtonText("Menu");
-                cggui.setStatusDisplay("Game has ended.");
-        }catch(ChessGUIException e){
-            System.out.println("No GUI field attached: " +e.getMessage());
+            cggui.setForfeitButtonText("Menu");
+            cggui.setStatusDisplay("Game has ended.");
+        } catch (ChessGUIException e) {
+            System.out.println("No GUI field attached: " + e.getMessage());
         }
     }
-    
-    public void callPosition(int rank, int file){
+
+    public void resetTables() {
+        db.dropTables();
+        db.createTables();
+    }
+
+    public void callPosition(int rank, int file) {
         Position pos = new Position(rank, file);
-        ArrayList<Position> validMoves = new ArrayList<Position>();
-        try{
+        ArrayList<Position> validMoves = new ArrayList<>();
+        try {
             // throws an error if game has ended
             checkGameEnd();
-            
+
             // select piece phase
-            if(selectedSquare == null){
+            if (selectedSquare == null) {
                 try {
                     // check for valid moves of selected square
                     validMoves = simulateMoves(pos, selectPiece(pos));
                 } catch (ChessGameException e) {
                     System.out.println(e.getMessage());
                     cggui.setStatusDisplay("Select a valid piece to move.");
-                    System.out.println("To move: ");
                 }
                 // if selected piece has valid move(s)
-                if(!validMoves.isEmpty()){
+                if (!validMoves.isEmpty()) {
                     // move into "piece is selected" phase
                     selectedSquare = pos;
                     cggui.setStatusDisplay("Select target (click the same square to deselect).");
-                    System.out.println("Target: ");
                     boolean[][] highlights = new boolean[cb.getRanks()][cb.getFiles()];
-                    for(Position p : validMoves){
+                    for (Position p : validMoves) {
                         highlights[p.getRank()][p.getFile()] = true;
                     }
                     cbgui.updateValidMoveDisplay(highlights);
-                }else{
+                } else {
                     cggui.setStatusDisplay("Selected square is invalid or has no moves.");
                 }
 
                 // "piece is selected" phase
-            }else{
+            } else {
                 validMoves = simulateMoves(selectedSquare, selectPiece(selectedSquare));
                 // cancel move if the same square is selected
-                if(pos.equals(selectedSquare)){
+                if (pos.equals(selectedSquare)) {
 
                     selectedSquare = null;
                     cbgui.clearAllHighlights();
-                    System.out.println("Piece deselected");
                     cggui.setStatusDisplay("Select a valid piece to move.");
-                    System.out.println("To move: ");
 
-                }else if(cb.containsTarget(pos, validMoves)) {
+                } else if (cb.containsTarget(pos, validMoves)) {
                     try {
                         confirmMove(selectedSquare, pos, validMoves);
 
                         // mark pawn for en passant
                         checkDoubleSquarePawnMove(cb.getPieceAt(pos), selectedSquare, pos);
-                        
+
                         // check promotion
                         if (isPromotable(pos)) {
                             cbgui.showPromotionMenu(pos.getRank(), pos.getFile());
-                            //promotionEvent(pos);
                         }
-                        
+
                         boolean[][] highlights = new boolean[cb.getRanks()][cb.getFiles()];
                         highlights[selectedSquare.getRank()][selectedSquare.getFile()] = true;
                         highlights[pos.getRank()][pos.getFile()] = true;
-                        
+
                         // updates gui
                         cbgui.updateRecentMoveDisplay(highlights);
                         cbgui.updatePieceIcons(cb.getBoardIcons());
-                        cggui.addGameLogDisplay(currentTurn.toString()+ " moved " +selectedSquare.toString()+ " to " +pos.toString() +"\n");
+                        cggui.addGameLogDisplay(currentTurn.toString() + " moved " + selectedSquare.toString() + " to " + pos.toString() + "\n");
                         cggui.setStatusDisplay("Select a valid piece to move.");
-                        
+
                         increaseTurn();
-                        
+
                         // clear all en passant on current player's pawns
                         cb.clearEnPassant(currentTurn);
-                        
-                        
-                        if(isCheckmate()){
+
+                        if (isCheckmate()) {
                             endGame();
-                        }else if(isChecked(cb)) {
-                            System.out.println("");
-                            System.out.println("IN CHECK");
-                            
-                            cggui.addGameLogDisplay(currentTurn.toString()+ " is in check \n");
-                        }else{
-                            
-                            System.out.println("To move: ");
+                        } else if (isChecked(cb)) {
+                            cggui.addGameLogDisplay(currentTurn.toString() + " is in check \n");
                         }
 
                     } catch (ChessGameException e) {
@@ -401,10 +393,10 @@ public class ChessGameController {
                     validMoves = null;
                 }
             }
-        } catch (ChessGameException | ChessGUIException e){
+        } catch (ChessGameException | ChessGUIException e) {
             System.out.println(e.getMessage());
         }
-       
+
     }
 
     public void initializeBoard() {
@@ -437,22 +429,19 @@ public class ChessGameController {
         // set first turn to White
         currentTurn = PieceColor.WHITE;
         turn = 1;
-        
-        
     }
-    
-    public void initializeGameGUI(){
-        try{
-            cbgui.updatePieceIcons(cb.getBoardIcons());
-            cggui.setTurnNumberDisplay("Turn number: " +String.valueOf(turn));
-            cggui.setPlayerTurnDisplay("Current turn: " +currentTurn.toString());
-            cggui.addGameLogDisplay("Turn "+turn+"\n");
-            cggui.setStatusDisplay("Select a valid piece to move.");
-        }catch(ChessGUIException e){
-            System.out.println("No GUI field attached: " +e.getMessage());
-        }
-            
-    }
-    
-}
 
+    public void initializeGameGUI() {
+        try {
+            cbgui.updatePieceIcons(cb.getBoardIcons());
+            cggui.setTurnNumberDisplay("Turn number: " + String.valueOf(turn));
+            cggui.setPlayerTurnDisplay("Current turn: " + currentTurn.toString());
+            cggui.addGameLogDisplay("Turn " + turn + "\n");
+            cggui.setStatusDisplay("Select a valid piece to move.");
+        } catch (ChessGUIException e) {
+            System.out.println("No GUI field attached: " + e.getMessage());
+        }
+
+    }
+
+}
