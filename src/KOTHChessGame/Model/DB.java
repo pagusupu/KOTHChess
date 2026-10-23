@@ -28,7 +28,6 @@ public class DB {
         if (this.con == null) {
             try {
                 con = DriverManager.getConnection(url, username, password);
-                System.out.println("DB Connected");
             } catch (SQLException e) {
                 System.out.println("DB: Error: " + e.getMessage());
             }
@@ -69,7 +68,6 @@ public class DB {
             ResultSet rs = dbmd.getTables(null, null, "MOVEHISTORY", null);
             if (!rs.next()) {
                 stmnt.executeUpdate("CREATE TABLE MOVEHISTORY (move int, source varchar(2), target varchar(2), promotion varchar(6))");
-                System.out.println("Table created.");
             } else {
                 System.out.println("Table already exists.");
             }
@@ -82,7 +80,6 @@ public class DB {
         try {
             stmnt = con.createStatement();
             stmnt.executeUpdate("DROP TABLE MOVEHISTORY");
-            System.out.println("Tables dropped.");
         } catch (SQLException e) {
             System.out.println("DB: Error: " + e.getMessage());
         }

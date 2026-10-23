@@ -39,11 +39,10 @@ public class ChessBoard {
         // Returns chess piece at given position 
         try {
             if (checkPosition(pos) == SquareState.OUT_OF_BOUNDS) {
-                //throw new ChessGameException("getPieceAt: Error: Position not in board\nPosition checked: " +pos.toString());
                 return null;
             }
         } catch (ChessGameException e) {
-            System.out.println(e);
+            System.out.println(e.getMessage());
             return null;
         }
         return pieces[pos.getRank()][pos.getFile()];
